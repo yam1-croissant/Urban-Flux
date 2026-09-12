@@ -1,0 +1,188 @@
+{
+  "network_id": "demo_city",
+  "name": "Bengaluru Central-East Resilience Corridor",
+  "version": "1.0.0",
+  "metadata": {
+    "city": "Bengaluru, Karnataka, India",
+    "center": {
+      "latitude": 12.9610,
+      "longitude": 77.6380
+    },
+    "zoom": 13.2,
+    "description": "Critical arterial and collector network spanning Indiranagar, Old Airport Road, Domlur, and Koramangala, featuring key hospital and employment access corridors.",
+    "provenance": {
+      "road_geometry": "OBSERVED / OpenStreetMap",
+      "speed_limits": "OBSERVED / Bangalore Traffic Police Arterial Guidelines",
+      "capacities": "MODELED / IRC-106 Urban Capacity Standards",
+      "baseline_flows": "OBSERVED / Kaggle Bangalore Traffic Pulse",
+      "od_demand": "SYNTHETIC / Hackathon Commuter Distribution",
+      "criticality_weights": "ASSUMED / Emergency Response Model"
+    }
+  },
+  "nodes": [
+    {
+      "id": "Zone_A",
+      "name": "Indiranagar Residential District",
+      "latitude": 12.9784,
+      "longitude": 77.6408,
+      "node_type": "zone"
+    },
+    {
+      "id": "Junction_B",
+      "name": "Old Airport Road / Domlur Flyover",
+      "latitude": 12.9610,
+      "longitude": 77.6430,
+      "node_type": "junction"
+    },
+    {
+      "id": "Hospital_C",
+      "name": "Manipal City Hospital Access Point",
+      "latitude": 12.9592,
+      "longitude": 77.6499,
+      "node_type": "critical_asset"
+    },
+    {
+      "id": "Junction_E",
+      "name": "Cambridge Layout / Ulsoor Junction",
+      "latitude": 12.9730,
+      "longitude": 77.6270,
+      "node_type": "junction"
+    },
+    {
+      "id": "Junction_F",
+      "name": "Domlur Inner Ring Road Bottleneck",
+      "latitude": 12.9550,
+      "longitude": 77.6360,
+      "node_type": "junction"
+    },
+    {
+      "id": "Zone_D",
+      "name": "Koramangala Commercial & Tech Hub",
+      "latitude": 12.9345,
+      "longitude": 77.6258,
+      "node_type": "zone"
+    }
+  ],
+  "edges": [
+    {
+      "id": "Bridge_A_B",
+      "name": "Northern Primary Flyover (Bridge A)",
+      "source": "Zone_A",
+      "target": "Junction_B",
+      "length_km": 3.5,
+      "free_flow_speed_kmph": 60.0,
+      "nominal_capacity_veh_per_hour": 2400.0,
+      "lanes": 4,
+      "road_class": "primary_arterial",
+      "baseline_flow_veh_per_hour": 400.0,
+      "status": "open",
+      "coordinates": [
+        [77.6408, 12.9784],
+        [77.6430, 12.9610]
+      ]
+    },
+    {
+      "id": "Arterial_B_C",
+      "name": "Old Airport Road Hospital Link",
+      "source": "Junction_B",
+      "target": "Hospital_C",
+      "length_km": 2.5,
+      "free_flow_speed_kmph": 50.0,
+      "nominal_capacity_veh_per_hour": 2200.0,
+      "lanes": 4,
+      "road_class": "arterial",
+      "baseline_flow_veh_per_hour": 200.0,
+      "status": "open",
+      "coordinates": [
+        [77.6430, 12.9610],
+        [77.6499, 12.9592]
+      ]
+    },
+    {
+      "id": "Arterial_C_D",
+      "name": "Inner Ring Road Southern Extension",
+      "source": "Hospital_C",
+      "target": "Zone_D",
+      "length_km": 3.0,
+      "free_flow_speed_kmph": 50.0,
+      "nominal_capacity_veh_per_hour": 2000.0,
+      "lanes": 4,
+      "road_class": "arterial",
+      "baseline_flow_veh_per_hour": 100.0,
+      "status": "open",
+      "coordinates": [
+        [77.6499, 12.9592],
+        [77.6258, 12.9345]
+      ]
+    },
+    {
+      "id": "Collector_A_E",
+      "name": "Cambridge Layout Secondary Collector",
+      "source": "Zone_A",
+      "target": "Junction_E",
+      "length_km": 4.5,
+      "free_flow_speed_kmph": 45.0,
+      "nominal_capacity_veh_per_hour": 1500.0,
+      "lanes": 2,
+      "road_class": "collector",
+      "baseline_flow_veh_per_hour": 200.0,
+      "status": "open",
+      "coordinates": [
+        [77.6408, 12.9784],
+        [77.6270, 12.9730]
+      ]
+    },
+    {
+      "id": "Bottleneck_E_F",
+      "name": "Domlur Canal Road Narrow Bottleneck",
+      "source": "Junction_E",
+      "target": "Junction_F",
+      "length_km": 5.0,
+      "free_flow_speed_kmph": 40.0,
+      "nominal_capacity_veh_per_hour": 1400.0,
+      "lanes": 2,
+      "road_class": "secondary",
+      "baseline_flow_veh_per_hour": 500.0,
+      "status": "open",
+      "coordinates": [
+        [77.6270, 12.9730],
+        [77.6360, 12.9550]
+      ]
+    },
+    {
+      "id": "Connector_F_C",
+      "name": "Wind Tunnel Road Hospital Feeder",
+      "source": "Junction_F",
+      "target": "Hospital_C",
+      "length_km": 2.0,
+      "free_flow_speed_kmph": 45.0,
+      "nominal_capacity_veh_per_hour": 1600.0,
+      "lanes": 2,
+      "road_class": "collector",
+      "baseline_flow_veh_per_hour": 150.0,
+      "status": "open",
+      "coordinates": [
+        [77.6360, 12.9550],
+        [77.6499, 12.9592]
+      ]
+    },
+    {
+      "id": "Connector_F_D",
+      "name": "Ejipura Connector to Koramangala",
+      "source": "Junction_F",
+      "target": "Zone_D",
+      "length_km": 2.5,
+      "free_flow_speed_kmph": 45.0,
+      "nominal_capacity_veh_per_hour": 1600.0,
+      "lanes": 2,
+      "road_class": "collector",
+      "baseline_flow_veh_per_hour": 100.0,
+      "status": "open",
+      "coordinates": [
+        [77.6360, 12.9550],
+        [77.6258, 12.9345]
+      ]
+    }
+  ]
+}
+

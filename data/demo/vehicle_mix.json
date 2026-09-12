@@ -1,0 +1,36 @@
+{
+  "network_id": "demo_city",
+  "provenance": "OBSERVED / IISc UVH-26 Dataset & Bangalore Comprehensive Mobility Plan",
+  "vehicle_classes": [
+    {
+      "class_id": "two_wheeler",
+      "name": "Two-Wheeler (Motorcycles & Scooters)",
+      "share_percentage": 45.0,
+      "pcu_equivalent": 0.50,
+      "average_speed_modifier": 1.10
+    },
+    {
+      "class_id": "car_cab",
+      "name": "Private Car & App-Taxi",
+      "share_percentage": 35.0,
+      "pcu_equivalent": 1.00,
+      "average_speed_modifier": 1.00
+    },
+    {
+      "class_id": "auto_rickshaw",
+      "name": "Auto-Rickshaw (3-Wheeler)",
+      "share_percentage": 12.0,
+      "pcu_equivalent": 0.80,
+      "average_speed_modifier": 0.85
+    },
+    {
+      "class_id": "bus_commercial",
+      "name": "Public Transit Bus & Light Commercial",
+      "share_percentage": 8.0,
+      "pcu_equivalent": 2.20,
+      "average_speed_modifier": 0.70
+    }
+  ],
+  "composite_pcu_factor": 0.946
+}
+

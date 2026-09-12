@@ -1,0 +1,107 @@
+{
+  "network_id": "demo_city",
+  "presets": [
+    {
+      "id": "scenario_baseline_rush_hour",
+      "name": "Normal Weekday Rush Hour (Baseline)",
+      "category": "baseline",
+      "description": "Unconstrained baseline network conditions during morning peak demand with all corridors operating at design capacity.",
+      "time_period": "weekday_rush_hour",
+      "disruptions": [],
+      "demand_modifiers": {},
+      "weather": {
+        "condition": "clear",
+        "rain_intensity_mm_hr": 0.0
+      }
+    },
+    {
+      "id": "scenario_bridge_closure_rush_hour",
+      "name": "Northern Primary Bridge Closure (Structural Failure)",
+      "category": "bridge_closure",
+      "description": "Complete physical closure of Bridge A (Bridge_A_B) due to structural inspection during morning peak hour. Forces 1,800 veh/hr of residential traffic onto southern residential collectors.",
+      "time_period": "weekday_rush_hour",
+      "disruptions": [
+        {
+          "asset_id": "Bridge_A_B",
+          "type": "closure",
+          "capacity_multiplier": 0.0,
+          "description": "Total vehicular shutdown of Northern Primary Bridge"
+        }
+      ],
+      "demand_modifiers": {},
+      "weather": {
+        "condition": "clear",
+        "rain_intensity_mm_hr": 0.0
+      }
+    },
+    {
+      "id": "scenario_waterlogging_rush_hour",
+      "name": "Severe Monsoon Waterlogging & Canal Overflow",
+      "category": "weather_disruption",
+      "description": "Intense torrential rainfall causes 50% capacity loss on the primary arterial bridge and 60% capacity loss on the Domlur Canal bottleneck due to severe urban waterlogging.",
+      "time_period": "weekday_rush_hour",
+      "disruptions": [
+        {
+          "asset_id": "Bridge_A_B",
+          "type": "waterlogging",
+          "capacity_multiplier": 0.50,
+          "description": "Submerged outer lanes on primary bridge"
+        },
+        {
+          "asset_id": "Bottleneck_E_F",
+          "type": "waterlogging",
+          "capacity_multiplier": 0.40,
+          "description": "Severe storm drain overflow on Domlur Canal Road"
+        }
+      ],
+      "demand_modifiers": {},
+      "weather": {
+        "condition": "heavy_rain",
+        "rain_intensity_mm_hr": 45.0
+      }
+    },
+    {
+      "id": "scenario_roadwork_construction",
+      "name": "Emergency Metro / Road Construction",
+      "category": "construction",
+      "description": "Lane closures for emergency utility repair cut nominal capacity by 50% along the Old Airport Road arterial corridor.",
+      "time_period": "weekday_rush_hour",
+      "disruptions": [
+        {
+          "asset_id": "Arterial_B_C",
+          "type": "construction",
+          "capacity_multiplier": 0.50,
+          "description": "2 of 4 lanes barricaded for pipeline maintenance"
+        }
+      ],
+      "demand_modifiers": {},
+      "weather": {
+        "condition": "clear",
+        "rain_intensity_mm_hr": 0.0
+      }
+    },
+    {
+      "id": "scenario_event_surge",
+      "name": "Commercial Tech Summit Demand Surge",
+      "category": "demand_surge",
+      "description": "Major international technology summit in Koramangala causes a 30% surge in inbound commuter demand combined with localized collector bottleneck restrictions.",
+      "time_period": "weekday_rush_hour",
+      "disruptions": [
+        {
+          "asset_id": "Collector_A_E",
+          "type": "curb_friction",
+          "capacity_multiplier": 0.75,
+          "description": "Event drop-off congestion reduces collector capacity by 25%"
+        }
+      ],
+      "demand_modifiers": {
+        "demand_multiplier": 1.30
+      },
+      "weather": {
+        "condition": "clear",
+        "rain_intensity_mm_hr": 0.0
+      }
+    }
+  ]
+}
+
