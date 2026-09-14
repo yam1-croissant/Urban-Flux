@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import os
 import sys
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Body, FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Ensure repo root is on sys.path
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -18,6 +21,7 @@ from src.simulation.graph import RoadNetwork
 from src.simulation.models import (
     CriticalAsset,
     Disruption,
+    DisruptionError,
     Edge,
     Node,
     ODDemand,
@@ -27,6 +31,7 @@ from src.simulation.simulation import simulate
 from backend.schemas import (
     CriticalAssetSchema,
     CriticalServiceImpactResponse,
+    DisruptionInput,
     EdgeEvaluationResponse,
     EdgeSchema,
     NodeSchema,
@@ -160,7 +165,7 @@ BENCHMARK_EDGES = [
         nominal_capacity_veh_per_hour=1500.0,
         road_class="collector",
         baseline_flow_veh_per_hour=200.0,
-        name="Agara Collector Bypass",
+        name="Agara Bypass Relief Collector",
     ),
     EdgeSchema(
         id="Bottleneck_E_F",
@@ -193,7 +198,7 @@ BENCHMARK_EDGES = [
         nominal_capacity_veh_per_hour=1600.0,
         road_class="collector",
         baseline_flow_veh_per_hour=100.0,
-        name="Koramangala-Whitefield Connector",
+        name="Koramangala to Tech Park Link",
     ),
     EdgeSchema(
         id="Connector_G_C",
@@ -229,6 +234,13 @@ BENCHMARK_CRITICAL_ASSETS = [
     )
 ]
 
+BENCHMARK_POIS = [
+    {"id": "poi_hospital_c", "name": "Manipal Trauma Center", "category": "hospital", "node_id": "Hospital_C", "coordinates": [77.658, 12.958]},
+    {"id": "poi_junction_b", "name": "Silk Board Junction", "category": "junction", "node_id": "Junction_B", "coordinates": [77.623, 12.917]},
+    {"id": "poi_junction_f", "name": "Sony World Junction", "category": "junction", "node_id": "Junction_F", "coordinates": [77.628, 12.936]},
+    {"id": "poi_zone_d", "name": "Whitefield Tech Hub", "category": "poi", "node_id": "Zone_D", "coordinates": [77.720, 12.975]},
+]
+
 DEFAULT_OD_DEMANDS = [
     ODDemand(
         id="OD_ZoneA_HospitalC",
@@ -248,42 +260,50 @@ DEFAULT_OD_DEMANDS = [
 
 PRESETS: List[ScenarioPreset] = [
     ScenarioPreset(
-        id="bridge_closure",
+        id="scenario_bridge_closure_rush_hour",
         name="Bridge Structural Closure",
         description="Acute 100% closure of Silk Board Bridge due to structural inspection.",
         icon="alert-triangle",
         disruptions=[
-            {"asset_id": "Bridge_A_B", "disruption_type": "closure", "capacity_multiplier": 0.0}
+            DisruptionInput(asset_id="Bridge_A_B", disruption_type="closure", capacity_multiplier=0.0)
         ],
-        recommended_mitigation_id="mitigation_reroute",
+        recommended_mitigation_id="scenario_mitigation_active_reroute",
     ),
     ScenarioPreset(
-        id="monsoon_flooding",
+        id="scenario_waterlogging_rush_hour",
         name="Monsoon Flash Flooding",
         description="50% capacity loss on primary corridors due to heavy waterlogging.",
         icon="cloud-rain",
         disruptions=[
-            {"asset_id": "Bridge_A_B", "disruption_type": "weather", "capacity_multiplier": 0.5},
-            {"asset_id": "Bottleneck_E_F", "disruption_type": "weather", "capacity_multiplier": 0.5},
+            DisruptionInput(asset_id="Bridge_A_B", disruption_type="weather", capacity_multiplier=0.5),
+            DisruptionInput(asset_id="Bottleneck_E_F", disruption_type="weather", capacity_multiplier=0.5),
         ],
     ),
     ScenarioPreset(
-        id="metro_construction",
+        id="scenario_roadwork_construction",
         name="Metro Line 3 Construction",
         description="Single lane blockage on Inner Ring Road approach reducing throughput by 35%.",
         icon="cone",
         disruptions=[
-            {"asset_id": "Arterial_B_C", "disruption_type": "construction", "capacity_multiplier": 0.65}
+            DisruptionInput(asset_id="Arterial_B_C", disruption_type="construction", capacity_multiplier=0.65)
         ],
     ),
     ScenarioPreset(
-        id="mitigation_reroute",
+        id="scenario_mitigation_active_reroute",
         name="Active Police Rerouting & Relief Lane",
         description="Deployment of traffic wardens and dedicated signal green-waves on North Relief corridor.",
         icon="shield-check",
         disruptions=[],
     ),
 ]
+
+# Aliases for frontend convenience
+PRESET_ALIAS_MAP = {
+    "bridge_closure": "scenario_bridge_closure_rush_hour",
+    "monsoon_flooding": "scenario_waterlogging_rush_hour",
+    "metro_construction": "scenario_roadwork_construction",
+    "mitigation_reroute": "scenario_mitigation_active_reroute",
+}
 
 
 def _build_sim_network() -> RoadNetwork:
@@ -313,30 +333,91 @@ def _build_sim_network() -> RoadNetwork:
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "UrbanResilience Digital Twin API", "version": "1.0.0"}
+    return {"status": "ok"}
+
+
+@app.get("/")
+def root_sitemap():
+    return {
+        "status": "online",
+        "service": "UrbanResilience Digital Twin API",
+        "version": "1.0.0",
+        "endpoints": {
+            "network": "/api/network",
+            "simulate": "/api/simulate",
+            "scenarios": "/api/scenarios",
+            "upload": "/api/data/upload",
+        },
+    }
 
 
 @app.get("/api/network")
-def get_network():
+def get_network(network_id: Optional[str] = "demo_city"):
     """Return the complete benchmark road network with nodes, edges, and critical assets."""
+    valid_ids = {"demo_city", "bengaluru_core_demo", "default", None}
+    if network_id not in valid_ids:
+        raise HTTPException(status_code=404, detail=f"Network '{network_id}' not found")
+
+    coords_map = {n.id: [n.longitude or 77.6, n.latitude or 12.9] for n in BENCHMARK_NODES}
+
+    edges_with_coords = []
+    for e in BENCHMARK_EDGES:
+        ed = e.model_dump()
+        src_coord = coords_map.get(e.source, [77.565, 12.925])
+        tgt_coord = coords_map.get(e.target, [77.623, 12.917])
+        ed["coordinates"] = [src_coord, tgt_coord]
+        edges_with_coords.append(ed)
+
     return {
-        "network_id": "bengaluru_core_demo",
+        "network_id": network_id or "demo_city",
         "name": "Bengaluru Central Arterial Corridor",
         "nodes": [n.model_dump() for n in BENCHMARK_NODES],
-        "edges": [e.model_dump() for e in BENCHMARK_EDGES],
+        "edges": edges_with_coords,
         "critical_assets": [c.model_dump() for c in BENCHMARK_CRITICAL_ASSETS],
+        "pois": BENCHMARK_POIS,
+        "metadata": {
+            "provenance": {
+                "road_geometry": "OBSERVED (OSM 2026)",
+                "traffic_counts": "ESTIMATED_PROBABILISTIC",
+                "capacity": "CALCULATED_FORMULA",
+            }
+        },
     }
 
 
 @app.get("/api/scenarios/presets", response_model=List[ScenarioPreset])
-def get_presets():
+def get_presets_list():
     """Return pre-packaged realistic disruption and mitigation scenarios."""
     return PRESETS
 
 
-@app.post("/api/simulate", response_model=SimulateResponse)
+@app.get("/api/scenarios")
+def list_scenarios():
+    """Return all preset scenario configurations."""
+    return {"presets": [p.model_dump() for p in PRESETS]}
+
+
+@app.get("/api/scenarios/{scenario_id}")
+def get_scenario(scenario_id: str):
+    """Retrieve specific preset scenario by ID."""
+    canonical_id = PRESET_ALIAS_MAP.get(scenario_id, scenario_id)
+    preset = next((p for p in PRESETS if p.id == canonical_id or p.id == scenario_id), None)
+    if not preset:
+        raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found")
+    return preset.model_dump()
+
+
+@app.post("/api/simulate")
 def run_simulation(req: SimulateRequest):
     """Execute deterministic network disruption simulation and return complete cascading metrics."""
+    known_edge_ids = {e.id for e in BENCHMARK_EDGES}
+    for d in req.disruptions:
+        if d.asset_id not in known_edge_ids:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unknown asset_id: '{d.asset_id}' not present in network",
+            )
+
     net = _build_sim_network()
 
     # Map disruptions
@@ -385,13 +466,16 @@ def run_simulation(req: SimulateRequest):
         )
 
     # Run core simulation engine
-    sim_res = simulate(
-        network=net,
-        od_demands=demands,
-        disruptions=disruptions,
-        critical_assets=crit_assets,
-        config=cfg,
-    )
+    try:
+        sim_res = simulate(
+            network=net,
+            od_demands=demands,
+            disruptions=disruptions,
+            critical_assets=crit_assets,
+            config=cfg,
+        )
+    except DisruptionError as err:
+        raise HTTPException(status_code=400, detail=str(err))
 
     # Format Edge evaluations
     def _fmt_edges(edge_dict):
@@ -414,7 +498,7 @@ def run_simulation(req: SimulateRequest):
                 is_overloaded=e.is_overloaded,
                 is_closed=e.is_closed,
                 status=e.status,
-            )
+            ).model_dump()
         return out
 
     # Format routes
@@ -434,11 +518,14 @@ def run_simulation(req: SimulateRequest):
             baseline_travel_time_minutes=r.baseline_travel_time_minutes,
             scenario_travel_time_minutes=r.scenario_travel_time_minutes,
             travel_time_change_minutes=r.travel_time_change_minutes,
-        )
+        ).model_dump()
         for r in sim_res.all_routes
     ]
 
-    changed_routes_out = [r for r in routes_out if r.rerouted or r.unserved or (r.travel_time_change_minutes and abs(r.travel_time_change_minutes) > 0.01)]
+    changed_routes_out = [
+        r for r in routes_out
+        if r["rerouted"] or r["unserved"] or (r["travel_time_change_minutes"] and abs(r["travel_time_change_minutes"]) > 0.01)
+    ]
 
     # Format critical service impacts
     crit_out = [
@@ -451,7 +538,7 @@ def run_simulation(req: SimulateRequest):
             scenario_access_time_minutes=c.scenario_access_time_minutes,
             response_time_delta_minutes=c.response_time_delta_minutes,
             access_lost=c.access_lost,
-        )
+        ).model_dump()
         for c in sim_res.critical_service_impacts
     ]
 
@@ -463,13 +550,13 @@ def run_simulation(req: SimulateRequest):
             if mult == 0.0:
                 explain_steps.append(f"Primary incident caused 100% physical closure on {pe} (capacity dropped to 0 veh/h).")
             else:
-                explain_steps.append(f"Hazard reduced available capacity on {pe} by {int((1-mult)*100)}%.")
+                explain_steps.append(f"Hazard reduced available capacity on {pe} by {int((1-mult)*100)}% (multiplier: {mult:.2f}).")
 
     for cr in changed_routes_out:
-        if cr.rerouted:
-            explain_steps.append(f"{int(cr.demand_veh_per_hour)} veh/h on trip {cr.origin} → {cr.destination} diverted onto alternate corridors, adding +{cr.extra_distance_km:.1f} km.")
-        elif cr.unserved:
-            explain_steps.append(f"Trip {cr.origin} → {cr.destination} lost all connectivity (unserved).")
+        if cr["rerouted"]:
+            explain_steps.append(f"{int(cr['demand_veh_per_hour'])} veh/h on trip {cr['origin']} → {cr['destination']} diverted onto alternate corridors, adding +{cr['extra_distance_km']:.1f} km.")
+        elif cr["unserved"]:
+            explain_steps.append(f"Trip {cr['origin']} → {cr['destination']} lost all connectivity (unserved).")
 
     if sim_res.newly_overloaded_edges:
         for ne in sim_res.newly_overloaded_edges:
@@ -477,35 +564,90 @@ def run_simulation(req: SimulateRequest):
             explain_steps.append(f"Secondary bottleneck overload triggered on {ne}: V/C surged to {s_edge.vc_ratio:.2f}, causing {s_edge.delay_minutes_per_vehicle:.1f} min/veh delay.")
 
     for ci in crit_out:
-        if ci.response_time_delta_minutes and ci.response_time_delta_minutes > 0.1:
-            explain_steps.append(f"Emergency transit time to {ci.asset_id} lengthened by +{ci.response_time_delta_minutes:.1f} minutes ({ci.baseline_access_time_minutes:.1f} → {ci.scenario_access_time_minutes:.1f} min).")
+        if ci["response_time_delta_minutes"] and ci["response_time_delta_minutes"] > 0.1:
+            explain_steps.append(f"Emergency transit time to {ci['asset_id']} lengthened by +{ci['response_time_delta_minutes']:.1f} minutes ({ci['baseline_access_time_minutes']:.1f} → {ci['scenario_access_time_minutes']:.1f} min).")
 
-    return SimulateResponse(
-        scenario_id="sim_" + "_".join(d.asset_id for d in req.disruptions) if req.disruptions else "baseline",
-        baseline_edges=_fmt_edges(sim_res.baseline_edges),
-        scenario_edges=_fmt_edges(sim_res.scenario_edges),
-        primary_disrupted_edges=sim_res.primary_disrupted_edges,
-        newly_overloaded_edges=sim_res.newly_overloaded_edges,
-        persistently_overloaded_edges=sim_res.persistently_overloaded_edges,
-        changed_routes=changed_routes_out,
-        all_routes=routes_out,
-        unserved_od_ids=sim_res.unserved_od_ids,
-        total_travel_time_change_minutes=sim_res.total_travel_time_change_minutes,
-        total_delay_change_vehicle_hours=sim_res.total_delay_change_vehicle_hours,
-        critical_service_impacts=crit_out,
-        explainability=explain_steps,
-        iterations_completed=sim_res.iterations_completed,
+    if not explain_steps:
+        explain_steps = ["Nominal baseline traffic flow with zero active disruptions."]
+
+    # Failed assets summary
+    failed_assets = [
+        {
+            "asset_id": d.asset_id,
+            "capacity_multiplier": d.capacity_multiplier,
+            "disruption_type": d.disruption_type,
+            "type": d.disruption_type,
+        }
+        for d in req.disruptions
+        if d.capacity_multiplier < 1.0
+    ]
+
+    base_delay_total = max(1e-6, sum(e.total_delay_veh_hours or 0.0 for e in sim_res.baseline_edges.values()))
+    delay_change_pct = (
+        (sim_res.total_delay_change_vehicle_hours / base_delay_total * 100.0)
+        if sim_res.primary_disrupted_edges
+        else 0.0
     )
 
+    scenario_name = (
+        f"baseline_{req.time_period}"
+        if not req.disruptions
+        else "sim_" + "_".join(d.asset_id for d in req.disruptions)
+    )
 
-@app.post("/api/scenarios/compare", response_model=ScenarioCompareResponse)
-def compare_scenarios(req: ScenarioCompareRequest):
+    return {
+        "status": "completed",
+        "scenario_id": scenario_name,
+        "baseline_edges": _fmt_edges(sim_res.baseline_edges),
+        "scenario_edges": _fmt_edges(sim_res.scenario_edges),
+        "primary_disrupted_edges": sim_res.primary_disrupted_edges,
+        "newly_overloaded_edges": sim_res.newly_overloaded_edges,
+        "persistently_overloaded_edges": sim_res.persistently_overloaded_edges,
+        "changed_routes": changed_routes_out,
+        "all_routes": routes_out,
+        "unserved_od_ids": sim_res.unserved_od_ids,
+        "total_travel_time_change_minutes": sim_res.total_travel_time_change_minutes,
+        "total_delay_change_vehicle_hours": sim_res.total_delay_change_vehicle_hours,
+        "critical_service_impacts": crit_out,
+        "critical_assets": crit_out,
+        "failed_assets": failed_assets,
+        "explainability": explain_steps,
+        "iterations_completed": sim_res.iterations_completed,
+        "metrics": {
+            "total_delay_change_veh_hours": sim_res.total_delay_change_vehicle_hours,
+            "delay_change_percent": delay_change_pct,
+            "newly_overloaded_count": len(sim_res.newly_overloaded_edges),
+            "unserved_trips_count": len(sim_res.unserved_od_ids),
+        },
+    }
+
+
+@app.post("/api/scenarios/compare")
+def compare_scenarios(payload: Dict[str, Any] = Body(...)):
     """Compare two scenario interventions and calculate quantifiable delay reduction."""
-    res_a = run_simulation(req.scenario_a)
-    res_b = run_simulation(req.scenario_b)
+    preset_map = {p.id: p for p in PRESETS}
+    preset_map.update({k: preset_map[v] for k, v in PRESET_ALIAS_MAP.items() if v in preset_map})
 
-    delay_a = res_a.total_delay_change_vehicle_hours
-    delay_b = res_b.total_delay_change_vehicle_hours
+    if "scenario_a_id" in payload and "scenario_b_id" in payload:
+        id_a = payload["scenario_a_id"]
+        id_b = payload["scenario_b_id"]
+        p_a = preset_map.get(id_a)
+        p_b = preset_map.get(id_b)
+        if not p_a or not p_b:
+            raise HTTPException(status_code=404, detail="Preset scenario not found")
+        req_a = SimulateRequest(disruptions=p_a.disruptions)
+        req_b = SimulateRequest(disruptions=p_b.disruptions)
+    elif "scenario_a" in payload and "scenario_b" in payload:
+        req_a = SimulateRequest(**payload["scenario_a"])
+        req_b = SimulateRequest(**payload["scenario_b"])
+    else:
+        raise HTTPException(status_code=422, detail="Invalid comparison request format")
+
+    res_a = run_simulation(req_a)
+    res_b = run_simulation(req_b)
+
+    delay_a = res_a["total_delay_change_vehicle_hours"]
+    delay_b = res_b["total_delay_change_vehicle_hours"]
     net_reduction = max(0.0, delay_a - delay_b)
     pct_imp = (net_reduction / delay_a * 100.0) if delay_a > 0.0 else 0.0
 
@@ -513,18 +655,154 @@ def compare_scenarios(req: ScenarioCompareRequest):
     if pct_imp <= 0:
         verdict = "No significant delay reduction detected between scenarios."
 
-    return ScenarioCompareResponse(
-        scenario_a_metrics={
+    return {
+        "scenario_a": res_a,
+        "scenario_b": res_b,
+        "scenario_a_metrics": {
             "total_delay_change_veh_h": delay_a,
-            "newly_overloaded_count": len(res_a.newly_overloaded_edges),
-            "unserved_od_count": len(res_a.unserved_od_ids),
+            "newly_overloaded_count": len(res_a["newly_overloaded_edges"]),
+            "unserved_od_count": len(res_a["unserved_od_ids"]),
         },
-        scenario_b_metrics={
+        "scenario_b_metrics": {
             "total_delay_change_veh_h": delay_b,
-            "newly_overloaded_count": len(res_b.newly_overloaded_edges),
-            "unserved_od_count": len(res_b.unserved_od_ids),
+            "newly_overloaded_count": len(res_b["newly_overloaded_edges"]),
+            "unserved_od_count": len(res_b["unserved_od_ids"]),
         },
-        net_delay_reduction_veh_hours=net_reduction,
-        percentage_improvement=pct_imp,
-        summary_verdict=verdict,
-    )
+        "net_delay_reduction_veh_hours": net_reduction,
+        "percentage_improvement": pct_imp,
+        "summary_verdict": verdict,
+        "delta": {
+            "delay_difference_veh_hours": net_reduction,
+            "mitigation_verdict": verdict,
+            "percentage_improvement": pct_imp,
+        },
+    }
+
+
+# =====================================================================
+# Data Pipeline & Normalization Endpoints
+# =====================================================================
+
+SUPPORTED_DATA_TYPES = {"traffic_count", "speed_observation", "od_demand"}
+
+COLUMN_SYNONYMS = {
+    "traffic_count": {
+        "road_id": ["road_id", "link_id", "edge_id", "segment_id"],
+        "flow": ["flow", "traffic_volume", "veh_count", "volume", "count"],
+        "timestamp": ["timestamp", "time", "date", "datetime"],
+    },
+    "speed_observation": {
+        "road_id": ["road_id", "link_id", "edge_id", "segment_id"],
+        "speed_kmh": ["speed_kmh", "avg_speed", "speed", "velocity"],
+        "timestamp": ["timestamp", "time", "date", "datetime"],
+    },
+}
+
+
+import json
+import re
+from fastapi import Request
+
+@app.post("/api/data/upload")
+async def upload_data(request: Request):
+    """Normalize and ingest external CSV or JSON traffic telemetry."""
+    content_type = request.headers.get("content-type", "")
+    target_data_type = None
+    raw_records = []
+
+    if "application/json" in content_type:
+        body_json = await request.json()
+        target_data_type = body_json.get("data_type")
+        raw_records = body_json.get("records", [])
+    elif "multipart/form-data" in content_type:
+        body_bytes = await request.body()
+        body_text = body_bytes.decode("utf-8", errors="ignore")
+        
+        # Extract data_type form field
+        dt_match = re.search(r'name="data_type"\r?\n\r?\n([^\r\n]+)', body_text)
+        if dt_match:
+            target_data_type = dt_match.group(1).strip()
+        
+        # Extract CSV file content
+        file_match = re.search(r'filename="[^"]+"\r?\nContent-Type:[^\r\n]+\r?\n\r?\n([\s\S]*?)\r?\n--', body_text)
+        if file_match:
+            csv_text = file_match.group(1).strip()
+            csv_reader = csv.DictReader(io.StringIO(csv_text))
+            raw_records = list(csv_reader)
+    else:
+        # Try json fallback
+        try:
+            body_json = await request.json()
+            target_data_type = body_json.get("data_type")
+            raw_records = body_json.get("records", [])
+        except Exception:
+            pass
+
+    if not target_data_type or target_data_type not in SUPPORTED_DATA_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported data_type: '{target_data_type}'. Supported: {list(SUPPORTED_DATA_TYPES)}",
+        )
+
+    # Apply column synonym normalization and schema validation
+    synonym_map = COLUMN_SYNONYMS.get(target_data_type, {})
+    accepted_records = []
+    rejected_records = []
+    mapping_applied = {}
+
+    for row in raw_records:
+        normalized_row = {}
+        # Attempt to map columns
+        for canonical_col, synonyms in synonym_map.items():
+            for syn in synonyms:
+                if syn in row and row[syn] is not None:
+                    normalized_row[canonical_col] = row[syn]
+                    mapping_applied[syn] = canonical_col
+                    break
+
+        # Validate
+        is_valid = True
+        reject_reason = None
+
+        if "road_id" not in normalized_row:
+            is_valid = False
+            reject_reason = "Missing required road/link identifier."
+        elif target_data_type == "traffic_count":
+            try:
+                flow_val = float(normalized_row.get("flow", -1))
+                if flow_val < 0:
+                    is_valid = False
+                    reject_reason = "Traffic flow value cannot be negative."
+                else:
+                    normalized_row["flow"] = flow_val
+            except (ValueError, TypeError):
+                is_valid = False
+                reject_reason = "Invalid numerical flow value."
+        elif target_data_type == "speed_observation":
+            try:
+                speed_val = float(normalized_row.get("speed_kmh", -1))
+                if speed_val < 0 or speed_val > 250:
+                    is_valid = False
+                    reject_reason = "Speed value out of physical bounds [0, 250 km/h]."
+                else:
+                    normalized_row["speed_kmh"] = speed_val
+            except (ValueError, TypeError):
+                is_valid = False
+                reject_reason = "Invalid numerical speed value."
+
+        if is_valid:
+            normalized_row["validation_status"] = "ACCEPTED"
+            accepted_records.append(normalized_row)
+        else:
+            normalized_row["validation_status"] = f"REJECTED: {reject_reason}"
+            rejected_records.append(normalized_row)
+
+    return {
+        "status": "success",
+        "data_type": target_data_type,
+        "total_records": len(raw_records),
+        "accepted_records": len(accepted_records),
+        "rejected_records": len(rejected_records),
+        "column_mapping_applied": mapping_applied,
+        "normalized_preview": (accepted_records + rejected_records)[:10],
+    }
