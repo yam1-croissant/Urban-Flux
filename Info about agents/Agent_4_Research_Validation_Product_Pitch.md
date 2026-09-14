@@ -627,7 +627,7 @@ A local disruption can become a city-wide problem.
 
 ## Slide 2 — Solution
 
-UrbanResilience Sim:
+UrbanFlux Sim:
 
 ```text
 Model → Disrupt → Simulate → Compare → Mitigate
@@ -778,7 +778,7 @@ where appropriate.
 # 21. Antigravity Pro Prompt
 
 ```text
-You are Agent 4 for UrbanResilience Sim.
+You are Agent 4 for UrbanFlux Sim.
 
 You own:
 - research verification

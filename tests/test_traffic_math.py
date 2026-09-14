@@ -1,4 +1,4 @@
-"""Comprehensive unit test suite for UrbanResilience Traffic Mathematics.
+"""Comprehensive unit test suite for UrbanFlux Traffic Mathematics.
 
 Covers:
 - Free-flow travel time (multiple lengths, speeds, edge cases, input validation)

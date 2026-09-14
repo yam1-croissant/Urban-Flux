@@ -1,8 +1,8 @@
-# UrbanResilience — Final Phase 1 Domain Model & System Synthesis
+# UrbanFlux — Final Phase 1 Domain Model & System Synthesis
 
 ## 1. Executive Summary & Phase 1 Accomplishment
 
-Phase 1 established the complete theoretical, mathematical, and data-provenance foundation for **UrbanResilience Sim**. 
+Phase 1 established the complete theoretical, mathematical, and data-provenance foundation for **UrbanFlux Sim**.
 
 The mathematical and simulation layer is packaged in `src/simulation/` and verified with 50 automated tests in `tests/`. This document serves as the formal architectural transition contract for **Phase 2 (Agent 2: Backend & Data Integration)** and **Phase 3 (Agent 3: Frontend & Visualization)**.
 
@@ -11,7 +11,7 @@ The mathematical and simulation layer is packaged in `src/simulation/` and verif
 ## 2. Answers to the Four Core Questions
 
 ### 1. What is a road?
-In UrbanResilience, a road is a directed edge $e = (u, v) \\in E$ in a graph $G = (V, E)$, characterized by physical, operational, and performance attributes:
+In UrbanFlux, a road is a directed edge $e = (u, v) \\in E$ in a graph $G = (V, E)$, characterized by physical, operational, and performance attributes:
 - **Geometry & Physics**: Length ($L$ in km), Free-Flow Speed ($v_f$ in km/h), Nominal Capacity ($C_{\\text{nom}}$ in veh/h), Road Class (`primary`, `arterial`, `collector`).
 - **Dynamic State**: Background Flow ($V_{\\text{base}}$), Assigned Demand Flow ($V_{\\text{demand}}$), Effective Capacity ($C_{\\text{eff}} = C_{\\text{nom}} \\cdot \\text{multiplier}$), Operational Status (`open`, `restricted`, `closed`).
 - **Performance Output**: Free-flow Time ($t_0$), Congested Travel Time ($t$), Delay per Vehicle ($d$), Aggregate Delay ($D_{\\text{total}}$), Overload Flag ($V/C > 1.0$).

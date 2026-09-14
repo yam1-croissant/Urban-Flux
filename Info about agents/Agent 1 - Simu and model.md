@@ -2,7 +2,7 @@
 
 ## Mission
 
-You own the **simulation brain** of UrbanResilience Sim.
+You own the **simulation brain** of UrbanFlux Sim.
 
 The goal is **not** to build a scientifically perfect city simulator. The goal is to make a **small, deterministic, explainable demo** that correctly demonstrates:
 
@@ -678,7 +678,7 @@ These belong to a future roadmap.
 Paste this into your Agent 1 session:
 
 ```text
-You are Agent 1 for UrbanResilience Sim.
+You are Agent 1 for UrbanFlux Sim.
 
 Your responsibility is ONLY the simulation and mathematical modeling layer.
 

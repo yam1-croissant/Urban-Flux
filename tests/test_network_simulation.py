@@ -1,4 +1,4 @@
-"""UrbanResilience — Part B: Unit & Integration Tests for Network Disruption & Cascade.
+"""UrbanFlux — Part B: Unit & Integration Tests for Network Disruption & Cascade.
 
 Verifies:
 1. Directed graph semantics and directionality enforcement.

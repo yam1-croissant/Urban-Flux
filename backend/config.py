@@ -1,4 +1,4 @@
-"""UrbanResilience Backend Configuration.
+"""UrbanFlux Backend Configuration.
 
 Handles paths, environment settings, and runtime library resolution.
 """
@@ -28,9 +28,9 @@ PORT = int(os.getenv("URBAN_PORT", "8000"))
 DEBUG = os.getenv("URBAN_DEBUG", "false").lower() in ("true", "1", "yes")
 
 # API metadata
-API_TITLE = "UrbanResilience Simulation & Cascade API"
+API_TITLE = "UrbanFlux Simulation & Cascade API"
 API_DESCRIPTION = (
-    "Backend API service bridging the UrbanResilience traffic simulation engine "
+    "Backend API service bridging the UrbanFlux traffic simulation engine "
     "to the bird's-eye map visualization frontend. Provides network topologies, "
     "scenario simulation, cascading overload evaluation, and explainability narratives."
 )

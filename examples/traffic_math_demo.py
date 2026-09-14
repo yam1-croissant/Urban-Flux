@@ -1,4 +1,4 @@
-"""UrbanResilience — Traffic Mathematics Demonstration.
+"""UrbanFlux — Traffic Mathematics Demonstration.
 
 Demonstrates the response of an illustrative Bangalore arterial road corridor
 (Silk Board Junction Corridor) to increasing levels of physical disruption:
@@ -36,7 +36,7 @@ from src.simulation.traffic_math import (
 
 def run_demonstration():
     print("=" * 84)
-    print("   URBANRESILIENCE — PART A: TRAFFIC MATHEMATICS DISRUPTION DEMO")
+    print("   URBANFLUX — PART A: TRAFFIC MATHEMATICS DISRUPTION DEMO")
     print("=" * 84)
     print()
 

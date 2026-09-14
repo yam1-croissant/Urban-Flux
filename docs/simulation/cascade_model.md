@@ -1,8 +1,8 @@
-# UrbanResilience — Cascading Overload Model
+# UrbanFlux — Cascading Overload Model
 
 ## 1. Causal Cascade Mechanism
 
-The core premise of UrbanResilience is demonstrating that urban infrastructure vulnerability does not stop at the boundary of a physical hazard. Instead, disruptions propagate through behavioral rerouting and network topology:
+The core premise of UrbanFlux is demonstrating that urban infrastructure vulnerability does not stop at the boundary of a physical hazard. Instead, disruptions propagate through behavioral rerouting and network topology:
 
 $$\\text{Primary Disruption} \\longrightarrow \\text{Link Infeasibility} \\longrightarrow \\text{Demand Detour} \\longrightarrow \\text{Flow Concentration} \\longrightarrow \\text{Secondary Overload} \\longrightarrow \\text{Critical Service Access Degradation}$$
 

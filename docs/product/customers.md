@@ -1,8 +1,8 @@
-# UrbanResilience — Customer Personas & Market Validation
+# UrbanFlux — Customer Personas & Market Validation
 
 ## 1. Primary Customer Segments
 
-UrbanResilience addresses critical planning bottlenecks across four primary enterprise and municipal stakeholders:
+UrbanFlux addresses critical planning bottlenecks across four primary enterprise and municipal stakeholders:
 
 ```text
 1. Municipal Traffic Authorities (e.g., Bengaluru Traffic Police / BTP)
@@ -20,7 +20,7 @@ UrbanResilience addresses critical planning bottlenecks across four primary ente
 - **Problem**: Need to authorize emergency lane closures, plan VIP convoy routes, or manage monsoon waterlogging diversions.
 - **Current Workflow**: Reactive deployment of ground constables after gridlock forms; intuitive manual diversions based on static experience.
 - **Pain Points**: Cannot predict where the diverted traffic will cause secondary gridlock; emergency ambulance routes get unintentionally blocked.
-- **UrbanResilience Value**: Instant simulation of diversion plans; automatic identification of secondary bottleneck overloads before barricades are placed.
+- **UrbanFlux Value**: Instant simulation of diversion plans; automatic identification of secondary bottleneck overloads before barricades are placed.
 
 ---
 
@@ -29,7 +29,7 @@ UrbanResilience addresses critical planning bottlenecks across four primary ente
 - **Problem**: Designing multi-year infrastructure upgrades (flyovers, underpasses, new metro corridors).
 - **Current Workflow**: Commissioning slow, expensive consultant traffic studies (\$50k–\$200k, 6–12 months turnaround).
 - **Pain Points**: Studies are outdated by the time construction starts; lack interactive tools to test phased construction closures.
-- **UrbanResilience Value**: Self-service scenario builder enabling rapid exploration of 50+ construction sequencing permutations in hours.
+- **UrbanFlux Value**: Self-service scenario builder enabling rapid exploration of 50+ construction sequencing permutations in hours.
 
 ---
 
@@ -38,7 +38,7 @@ UrbanResilience addresses critical planning bottlenecks across four primary ente
 - **Problem**: Must submit mandatory Traffic Diversion Plans (TDP) to municipal authorities before blocking arterial roads.
 - **Current Workflow**: Hiring external transport consultants to produce static PDF reports; frequent rejection or severe public backlash due to unexpected gridlock.
 - **Pain Points**: Construction delays cost millions of rupees per day if diversion approvals are stalled.
-- **UrbanResilience Value**: Automated generation of mathematically defensible Traffic Diversion Impact Reports with quantifiable delay metrics.
+- **UrbanFlux Value**: Automated generation of mathematically defensible Traffic Diversion Impact Reports with quantifiable delay metrics.
 
 ---
 
@@ -47,7 +47,7 @@ UrbanResilience addresses critical planning bottlenecks across four primary ente
 - **Problem**: Ensuring ambulance response times remain under the "Golden Hour" threshold during extreme weather or major city events.
 - **Current Workflow**: Static route planning; reliance on consumer navigation apps that do not anticipate cascading gridlock.
 - **Pain Points**: Ambulances get trapped in secondary congestion caused by unrelated arterial closures.
-- **UrbanResilience Value**: Real-time critical asset accessibility tracking; proactive alerts when a road closure degrades hospital access times beyond acceptable thresholds.
+- **UrbanFlux Value**: Real-time critical asset accessibility tracking; proactive alerts when a road closure degrades hospital access times beyond acceptable thresholds.
 
 ---
 

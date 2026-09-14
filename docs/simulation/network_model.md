@@ -1,8 +1,8 @@
-# UrbanResilience — Network Model Specification
+# UrbanFlux — Network Model Specification
 
 ## 1. Graph Semantics & Architecture
 
-UrbanResilience represents urban road infrastructure as a directed graph:
+UrbanFlux represents urban road infrastructure as a directed graph:
 
 $$G = (V, E)$$
 

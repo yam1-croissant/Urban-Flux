@@ -1,8 +1,8 @@
-# UrbanResilience — Part A: Traffic Mathematics Model
+# UrbanFlux — Part A: Traffic Mathematics Model
 
 ## Tiny Context
 
-We are building the mathematical traffic-flow foundation for UrbanResilience.
+We are building the mathematical traffic-flow foundation for UrbanFlux.
 
 Use the **Bangalore's Traffic Pulse** dataset from Kaggle as the primary real-world traffic dataset:
 
@@ -16,7 +16,7 @@ Do **not** spend time researching what this project or dataset is. Start directl
 
 ## Objective
 
-Build the first working mathematical traffic model for UrbanResilience.
+Build the first working mathematical traffic model for UrbanFlux.
 
 Focus on:
 
@@ -369,7 +369,7 @@ from src.simulation.traffic_math import (
 )
 ```
 
-and use the functions directly in the UrbanResilience simulation.
+and use the functions directly in the UrbanFlux simulation.
 
 ## Final Principle
 

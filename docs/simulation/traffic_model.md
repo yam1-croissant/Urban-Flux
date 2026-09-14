@@ -1,8 +1,8 @@
-# UrbanResilience — Traffic Flow & Delay Model Specification
+# UrbanFlux — Traffic Flow & Delay Model Specification
 
 ## 1. Domain Overview & Problem Statement
 
-UrbanResilience models link-level traffic impedance, congestion delay, and physical disruption consequences on urban road networks. The primary question addressed by this model is:
+UrbanFlux models link-level traffic impedance, congestion delay, and physical disruption consequences on urban road networks. The primary question addressed by this model is:
 
 > **Given a road link's length ($L$), free-flow speed ($v_f$), nominal capacity ($C$), and hourly vehicular flow ($V$), how do we calculate travel time ($t$), volume-to-capacity saturation ($V/C$), congestion delay ($d$), and network delay ($D_{\\text{total}}$)?**
 

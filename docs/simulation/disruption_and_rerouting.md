@@ -1,8 +1,8 @@
-# UrbanResilience — Disruption & Rerouting Specification
+# UrbanFlux — Disruption & Rerouting Specification
 
 ## 1. Disruption Schema & Semantics
 
-In UrbanResilience, physical incidents, extreme weather hazards, and structural closures are represented as declarative `Disruption` records rather than special-case code logic:
+In UrbanFlux, physical incidents, extreme weather hazards, and structural closures are represented as declarative `Disruption` records rather than special-case code logic:
 
 ```python
 @dataclass(frozen=True)
@@ -21,7 +21,7 @@ class Disruption:
 
 ## 2. Demand Assignment & Rerouting Algorithm
 
-UrbanResilience executes a deterministic 5-step simulation pipeline:
+UrbanFlux executes a deterministic 5-step simulation pipeline:
 
 ```text
 [Baseline OD Demand]

@@ -1,4 +1,4 @@
-"""UrbanResilience Backend Package."""
+"""UrbanFlux Backend Package."""
 
 from backend.main import app
 

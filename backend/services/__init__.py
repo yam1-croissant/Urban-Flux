@@ -1,4 +1,4 @@
-"""UrbanResilience Backend Services."""
+"""UrbanFlux Backend Services."""
 
 from backend.services.data_service import DataService, data_service
 from backend.services.explainability import generate_explainability_narrative

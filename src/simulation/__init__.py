@@ -1,4 +1,4 @@
-"""UrbanResilience — Traffic Simulation Package.
+"""UrbanFlux — Traffic Simulation Package.
 
 Includes:
 - Traffic Mathematics (Part A): free_flow_time, vc_ratio, bpr_travel_time, delay, reduced_capacity

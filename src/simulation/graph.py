@@ -1,4 +1,4 @@
-"""UrbanResilience — Part B: Road Network Graph Representation & Shortest Path.
+"""UrbanFlux — Part B: Road Network Graph Representation & Shortest Path.
 
 Provides strict topology validation and deterministic Dijkstra routing
 with lexicographical tie-breaking.

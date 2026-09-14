@@ -1,4 +1,4 @@
-"""UrbanResilience Backend API Schemas."""
+"""UrbanFlux Backend API Schemas."""
 
 from backend.schemas.data import (
     DataUploadRequest,

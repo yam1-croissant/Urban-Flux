@@ -1,4 +1,4 @@
-"""UrbanResilience — Part B: Network Disruption & Cascade Simulation Orchestrator.
+"""UrbanFlux — Part B: Network Disruption & Cascade Simulation Orchestrator.
 
 Orchestrates baseline assignment, disruption application, rerouting, Part A
 traffic math re-evaluation, secondary overload classification, and critical service

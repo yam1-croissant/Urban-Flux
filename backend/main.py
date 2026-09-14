@@ -1,4 +1,4 @@
-"""UrbanResilience Simulation & Cascading Disruption Backend Application.
+"""UrbanFlux Simulation & Cascading Disruption Backend Application.
 
 Main entry point for FastAPI service.
 """

@@ -1,4 +1,4 @@
-"""UrbanResilience — Part B: Network Disruption, Rerouting & Cascade Demo.
+"""UrbanFlux — Part B: Network Disruption, Rerouting & Cascade Demo.
 
 Demonstrates how an acute road disruption (e.g., bridge structural failure)
 triggers traffic rerouting across alternate corridors, creates secondary overloads
@@ -122,7 +122,7 @@ def build_demo_network() -> RoadNetwork:
 
 def run_demo():
     print("=" * 88)
-    print("   URBANRESILIENCE — PART B: NETWORK DISRUPTION & CASCADE SIMULATION DEMO")
+    print("   URBANFLUX — PART B: NETWORK DISRUPTION & CASCADE SIMULATION DEMO")
     print("=" * 88)
     print()
 

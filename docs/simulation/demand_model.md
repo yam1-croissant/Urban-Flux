@@ -1,4 +1,4 @@
-# UrbanResilience — Demand & Origin-Destination (OD) Model
+# UrbanFlux — Demand & Origin-Destination (OD) Model
 
 ## 1. Objective & Main Question
 

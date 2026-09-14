@@ -1,6 +1,6 @@
-# UrbanResilience — Backend API Specification & Integration Contract
+# UrbanFlux — Backend API Specification & Integration Contract
 
-This document provides the formal API specification for **UrbanResilience Sim**. It serves as the integration contract between the **FastAPI Backend (Agent 2)**, the **Simulation Engine (Agent 1)**, and the **Bird's-Eye Map Interface (Agent 3)**.
+This document provides the formal API specification for **UrbanFlux Sim**. It serves as the integration contract between the **FastAPI Backend (Agent 2)**, the **Simulation Engine (Agent 1)**, and the **Bird's-Eye Map Interface (Agent 3)**.
 
 ---
 

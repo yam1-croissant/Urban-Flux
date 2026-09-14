@@ -1,4 +1,4 @@
-"""Integration and functional tests for the UrbanResilience FastAPI backend."""
+"""Integration and functional tests for the UrbanFlux FastAPI backend."""
 
 import os
 import sys

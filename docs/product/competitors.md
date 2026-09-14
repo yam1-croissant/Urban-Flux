@@ -1,14 +1,14 @@
-# UrbanResilience — Competitive Landscape & Product Differentiation
+# UrbanFlux — Competitive Landscape & Product Differentiation
 
 ## 1. Executive Summary
 
-UrbanResilience is positioned as a **Predictive Infrastructure Resilience & Cascade Simulator**, bridging the gap between heavy, offline microscopic traffic modeling tools (which require months of calibration) and consumer traffic maps (which only show current congestion without predictive "what-if" disruption cascading).
+UrbanFlux is positioned as a **Predictive Infrastructure Resilience & Cascade Simulator**, bridging the gap between heavy, offline microscopic traffic modeling tools (which require months of calibration) and consumer traffic maps (which only show current congestion without predictive "what-if" disruption cascading).
 
 ---
 
 ## 2. Competitive Landscape Matrix
 
-| Company / Platform | Target Customer | Core Strengths | Critical Gaps & Limitations | UrbanResilience Strategic Advantage |
+| Company / Platform | Target Customer | Core Strengths | Critical Gaps & Limitations | UrbanFlux Strategic Advantage |
 |---|---|---|---|---|
 | **PTV Visum / Vissim** (PTV Group) | Transport Engineers, State DOTs | Gold standard microscopic & macroscopic simulation; highly detailed car-following & signal control. | Prohibitively expensive (\$25k–\$100k/seat); steep learning curve; requires months of data calibration; no built-in cross-system cascading impact on hospitals/utilities. | **Rapid, lightweight scenario simulation (seconds, not weeks)**; direct multi-system cascading metrics (hospital accessibility, critical asset risk). |
 | **Aimsun Next** (Siemens) | Highway Authorities, Large Consultancies | Multi-resolution modeling (macro to micro); hybrid assignment. | Heavy desktop software; closed proprietary ecosystems; high license barriers for municipal staff. | **Open-data native (OSM)**; modular Python API; instant cloud-ready scenario execution. |
@@ -23,7 +23,7 @@ UrbanResilience is positioned as a **Predictive Infrastructure Resilience & Casc
 ```text
                High Analytical Depth (Simulation)
                              │
-                             │      ★ UrbanResilience
+                             │      ★ UrbanFlux
              PTV Vissim      │      (Rapid Cascades & Cross-System Impact)
              Aimsun          │
                              │

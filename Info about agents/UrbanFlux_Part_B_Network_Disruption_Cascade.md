@@ -1,4 +1,4 @@
-# UrbanResilience — Part B: Network, Disruption, Rerouting & Cascade
+# UrbanFlux — Part B: Network, Disruption, Rerouting & Cascade
 
 ## Tiny Context
 

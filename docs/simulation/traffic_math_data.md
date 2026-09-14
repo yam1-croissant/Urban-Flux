@@ -1,4 +1,4 @@
-# UrbanResilience — Traffic Mathematics Data Analysis & Mapping
+# UrbanFlux — Traffic Mathematics Data Analysis & Mapping
 
 ## 1. Dataset Overview
 
@@ -20,7 +20,7 @@
 
 ## 2. Variable Mapping & Provenance
 
-To maintain strict scientific integrity, all variables in the UrbanResilience simulation are classified into four mutually exclusive categories:
+To maintain strict scientific integrity, all variables in the UrbanFlux simulation are classified into four mutually exclusive categories:
 1. **Observed**: Directly recorded in `Banglore_traffic_Dataset.csv`.
 2. **Derived**: Computed mathematically from observed dataset fields without external assumptions.
 3. **Assumed**: Explicitly documented assumptions introduced where direct measurements do not exist.
@@ -107,7 +107,7 @@ Corridors ranked by mean observed Congestion Level:
 ### 4.2 Why Intra-Day Peak-Hour Analysis Cannot Be Claimed from This File
 
 - **Dataset Limitation**: Each record in `Banglore_traffic_Dataset.csv` represents a single daily aggregate for a specific road on a given calendar date. The dataset **lacks hourly timestamps (e.g. 08:00 AM, 05:30 PM)**.
-- **Handling in UrbanResilience**:
+- **Handling in UrbanFlux**:
   - We do **not** claim to observe hourly AM/PM peaks directly from this file.
   - For hourly simulation and demonstration scenarios (such as `examples/traffic_math_demo.py`), we convert daily volume to peak hourly demand using standard transportation planning assumptions:
     211183V_{\text{peak}} = V_{\text{daily}} \times k211183

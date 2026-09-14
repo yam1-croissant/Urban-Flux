@@ -1,4 +1,4 @@
-"""UrbanResilience — Part B: Network, Disruption, Rerouting & Cascade Data Models.
+"""UrbanFlux — Part B: Network, Disruption, Rerouting & Cascade Data Models.
 
 Defines typed, immutable dataclasses for road network nodes, edges, OD demand,
 disruptions, evaluated link states, routing results, and critical asset metrics.

@@ -1,4 +1,4 @@
-# UrbanResilience Sim — Phase 1 Parallel Work Plan
+# UrbanFlux Sim — Phase 1 Parallel Work Plan
 
 ## Team Strategy
 

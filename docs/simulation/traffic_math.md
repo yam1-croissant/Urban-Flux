@@ -1,8 +1,8 @@
-# UrbanResilience — Traffic Mathematics Model Specification
+# UrbanFlux — Traffic Mathematics Model Specification
 
 ## 1. Executive Summary & Purpose
 
-UrbanResilience simulates the cascading societal and infrastructure consequences of urban road disruptions (e.g., severe waterlogging, construction lane blockages, bridge structural closures, or traffic incidents).
+UrbanFlux simulates the cascading societal and infrastructure consequences of urban road disruptions (e.g., severe waterlogging, construction lane blockages, bridge structural closures, or traffic incidents).
 
 The **Traffic Mathematics Model** (`src/simulation/traffic_math.py`) establishes the deterministic mathematical foundation for link-level traffic impedance, congestion delay, and capacity degradation. Downstream components (routing graph evaluators, emergency service response simulators, and cascading impact engines) build upon this module to evaluate how network disruptions alter travel times and spill over into essential city services.
 
@@ -90,7 +90,7 @@ All public functions adhere to a strict unit contract:
 
 ## 4. Closure Semantics & Boundary Safety
 
-A primary failure mode in naive traffic models is dividing by zero when a road is completely closed (\(C = 0\)). UrbanResilience enforces strict mathematical and computational boundaries:
+A primary failure mode in naive traffic models is dividing by zero when a road is completely closed (\(C = 0\)). UrbanFlux enforces strict mathematical and computational boundaries:
 
 1. **Explicit Zero-Capacity Error**:
    Calling `vc_ratio(volume, capacity=0)` or `bpr_travel_time(t0, volume, capacity=0)` raises `RoadClosedError` (a subclass of `TrafficMathError` and `ValueError`).

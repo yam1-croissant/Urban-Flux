@@ -1,4 +1,4 @@
-# UrbanResilience — Infrastructure Criticality Model
+# UrbanFlux — Infrastructure Criticality Model
 
 ## 1. Objective & Main Question
 

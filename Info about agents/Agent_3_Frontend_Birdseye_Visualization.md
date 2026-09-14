@@ -115,7 +115,7 @@ Recommended:
 
 ```text
 ┌──────────────────────────────────────────────────────────────┐
-│ URBANRESILIENCE          ● SIMULATION READY     [Scenario]  │
+│ URBANFLUX          ● SIMULATION READY     [Scenario]  │
 ├──────────────┬───────────────────────────────────────────────┤
 │              │                                               │
 │ SCENARIO     │                                               │
@@ -564,7 +564,7 @@ A polished single flow beats a huge unfinished interface.
 # 23. Antigravity Pro Prompt
 
 ```text
-You are Agent 3 for UrbanResilience Sim.
+You are Agent 3 for UrbanFlux Sim.
 
 You own ONLY:
 - React frontend

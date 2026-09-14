@@ -1,8 +1,8 @@
-# UrbanResilience — Scientific Data Sources & Provenance Matrix
+# UrbanFlux — Scientific Data Sources & Provenance Matrix
 
 ## 1. Data Architecture Strategy
 
-UrbanResilience integrates multiple focused real-world datasets, where each dataset supplies a distinct architectural layer of the city model:
+UrbanFlux integrates multiple focused real-world datasets, where each dataset supplies a distinct architectural layer of the city model:
 
 ```text
 [OpenStreetMap / OSMnx] ───> Network Topology, Geometry, Road Classes, POIs
@@ -16,7 +16,7 @@ UrbanResilience integrates multiple focused real-world datasets, where each data
 
 ## 2. Comprehensive Data Provenance Matrix
 
-| Variable / Layer | Primary Source | Geography | Spatial / Temporal Resolution | License / Access | Observed vs Modeled | How We Use It in UrbanResilience | Limitations & Integrity Guardrails |
+| Variable / Layer | Primary Source | Geography | Spatial / Temporal Resolution | License / Access | Observed vs Modeled | How We Use It in UrbanFlux | Limitations & Integrity Guardrails |
 |---|---|---|---|---|---|---|---|
 | **Road Network Skeleton** | OpenStreetMap (OSM) via OSMnx | Bengaluru, India | Node/Edge precision (Lat/Lon coordinates) | ODbL (Open Database License) | **Observed** | Constructs graph topology $G=(V,E)$, link lengths ($L$), intersections, and functional road classes. | OSM speed limits and lane counts are occasionally incomplete; missing lane attributes default to functional class baselines. |
 | **Corridor Traffic Volume** | *Bangalore Traffic Pulse* (Kaggle) | Bengaluru (8 zones, 16 arterial links) | 8,936 daily records (2022–2024) | Open Public Dataset | **Observed** | Provides empirical distributions for link volume, congestion, and baseline speed calibration. | Daily aggregate records lack intra-day hourly timestamps; peak hourly flows are derived using standard factors ($k_{\\text{peak}} = 0.085$). |

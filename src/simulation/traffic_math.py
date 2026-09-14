@@ -1,4 +1,4 @@
-"""UrbanResilience — Part A: Traffic Mathematics Foundation.
+"""UrbanFlux — Part A: Traffic Mathematics Foundation.
 
 This module provides standard, deterministic mathematical models for traffic-flow
 relationships and disruption analysis:

@@ -1,8 +1,8 @@
-# UrbanResilience — Business Model & Monetization Strategy
+# UrbanFlux — Business Model & Monetization Strategy
 
 ## 1. Executive Summary
 
-UrbanResilience operates a **B2G (Business-to-Government) and B2B SaaS licensing model**, complemented by API-based infrastructure simulation services for engineering consultancies and construction contractors.
+UrbanFlux operates a **B2G (Business-to-Government) and B2B SaaS licensing model**, complemented by API-based infrastructure simulation services for engineering consultancies and construction contractors.
 
 ---
 
