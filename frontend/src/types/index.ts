@@ -21,6 +21,7 @@ export interface EdgeData {
   baseline_flow_veh_per_hour: number;
   status: "open" | "restricted" | "closed";
   name?: string;
+  coordinates?: [number, number][]; // [[lat, lon], ...] or [[lon, lat], ...]
 }
 
 export interface CriticalAssetData {
@@ -31,12 +32,21 @@ export interface CriticalAssetData {
   name?: string;
 }
 
+export interface POIData {
+  id: string;
+  name: string;
+  category: string;
+  node_id: string;
+  coordinates: [number, number]; // [lon, lat] or [lat, lon]
+}
+
 export interface NetworkResponse {
   network_id: string;
   name: string;
   nodes: NodeData[];
   edges: EdgeData[];
   critical_assets: CriticalAssetData[];
+  pois?: POIData[];
 }
 
 export interface DisruptionInput {

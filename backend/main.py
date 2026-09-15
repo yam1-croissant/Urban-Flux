@@ -42,6 +42,15 @@ from backend.schemas import (
     SimulateRequest,
     SimulateResponse,
 )
+from backend.services.ml_service import ml_service
+from backend.bangalore_data import (
+    BANGALORE_METRO_NODES,
+    BANGALORE_METRO_EDGES,
+    BANGALORE_METRO_CRITICAL_ASSETS,
+    BANGALORE_METRO_POIS,
+    BANGALORE_METRO_DEMANDS,
+    BANGALORE_METRO_PRESETS,
+)
 
 app = FastAPI(
     title="UrbanResilience Digital Twin API",
@@ -351,12 +360,50 @@ def root_sitemap():
     }
 
 
+ALL_PRESETS = PRESETS + BANGALORE_METRO_PRESETS
+PRESET_MAP = {p.id: p for p in ALL_PRESETS}
+for k, v in PRESET_ALIAS_MAP.items():
+    if v in PRESET_MAP:
+        PRESET_MAP[k] = PRESET_MAP[v]
+
+
 @app.get("/api/network")
 def get_network(network_id: Optional[str] = "demo_city"):
-    """Return the complete benchmark road network with nodes, edges, and critical assets."""
-    valid_ids = {"demo_city", "bengaluru_core_demo", "default", None}
+    """Return the complete benchmark or Greater Bengaluru road network with nodes, edges, and critical assets."""
+    valid_ids = {"demo_city", "bengaluru_core_demo", "bangalore_metro", "default", None}
     if network_id not in valid_ids:
         raise HTTPException(status_code=404, detail=f"Network '{network_id}' not found")
+
+    if network_id == "bangalore_metro":
+        coords_map = {n.id: [n.longitude or 77.6, n.latitude or 12.9] for n in BANGALORE_METRO_NODES}
+        edges_with_coords = []
+        for e in BANGALORE_METRO_EDGES:
+            ed = e.model_dump()
+            if not ed.get("coordinates"):
+                src_coord = coords_map.get(e.source, [77.6238, 12.9175])
+                tgt_coord = coords_map.get(e.target, [77.6600, 12.8450])
+                ed["coordinates"] = [src_coord, tgt_coord]
+            edges_with_coords.append(ed)
+
+        return {
+            "network_id": "bangalore_metro",
+            "name": "Greater Bengaluru Metro Arterial Network",
+            "nodes": [n.model_dump() for n in BANGALORE_METRO_NODES],
+            "edges": edges_with_coords,
+            "critical_assets": [c.model_dump() for c in BANGALORE_METRO_CRITICAL_ASSETS],
+            "pois": BANGALORE_METRO_POIS,
+            "metadata": {
+                "city": "Bengaluru, Karnataka, India",
+                "provenance": {
+                    "road_geometry": "OBSERVED / OpenStreetMap",
+                    "speed_limits": "OBSERVED / Bangalore Traffic Police Guidelines",
+                    "capacities": "MODELED / IRC-106 Urban Capacity Standards",
+                    "baseline_flows": "OBSERVED / Kaggle Bangalore Traffic Pulse (8,936 records)",
+                    "od_demand": "SYNTHETIC / Commuter Distribution",
+                    "criticality_weights": "MODELED / Emergency Response Framework",
+                },
+            },
+        }
 
     coords_map = {n.id: [n.longitude or 77.6, n.latitude or 12.9] for n in BENCHMARK_NODES}
 
@@ -388,29 +435,85 @@ def get_network(network_id: Optional[str] = "demo_city"):
 @app.get("/api/scenarios/presets", response_model=List[ScenarioPreset])
 def get_presets_list():
     """Return pre-packaged realistic disruption and mitigation scenarios."""
-    return PRESETS
+    return ALL_PRESETS
 
 
 @app.get("/api/scenarios")
 def list_scenarios():
     """Return all preset scenario configurations."""
-    return {"presets": [p.model_dump() for p in PRESETS]}
+    return {"presets": [p.model_dump() for p in ALL_PRESETS]}
 
 
 @app.get("/api/scenarios/{scenario_id}")
 def get_scenario(scenario_id: str):
     """Retrieve specific preset scenario by ID."""
     canonical_id = PRESET_ALIAS_MAP.get(scenario_id, scenario_id)
-    preset = next((p for p in PRESETS if p.id == canonical_id or p.id == scenario_id), None)
+    preset = PRESET_MAP.get(canonical_id) or PRESET_MAP.get(scenario_id)
     if not preset:
         raise HTTPException(status_code=404, detail=f"Scenario '{scenario_id}' not found")
     return preset.model_dump()
 
 
+# =====================================================================
+# Empirical ML Endpoints (Kaggle Bengaluru Traffic Pulse - 8,936 rows)
+# =====================================================================
+
+@app.get("/api/ml/metadata")
+def get_ml_metadata():
+    """Return metadata about trained Bangalore Traffic Pulse ML model."""
+    return ml_service.get_metadata()
+
+
+@app.get("/api/ml/corridors")
+def get_ml_corridor_stats():
+    """Return empirical statistics for all 16 corridors from 8,936 Bengaluru observations."""
+    return {"corridors": ml_service.get_corridor_stats()}
+
+
+@app.post("/api/ml/predict")
+def predict_traffic_conditions(payload: Dict[str, Any] = Body(...)):
+    """Run ML regressor prediction on a corridor given weather, incidents, and volume."""
+    area_name = payload.get("area_name", "Koramangala")
+    road_name = payload.get("road_name", "Sony World Junction")
+    traffic_volume = float(payload.get("traffic_volume", 35000.0))
+    incident_reports = int(payload.get("incident_reports", 1))
+    weather_condition = payload.get("weather_condition", "Clear")
+    roadwork = payload.get("roadwork", "No")
+
+    try:
+        res = ml_service.predict(
+            area_name=area_name,
+            road_name=road_name,
+            traffic_volume=traffic_volume,
+            incident_reports=incident_reports,
+            weather_condition=weather_condition,
+            roadwork=roadwork,
+        )
+        return res
+    except Exception as err:
+        raise HTTPException(status_code=500, detail=str(err))
+
+
 @app.post("/api/simulate")
 def run_simulation(req: SimulateRequest):
     """Execute deterministic network disruption simulation and return complete cascading metrics."""
-    known_edge_ids = {e.id for e in BENCHMARK_EDGES}
+    is_metro = (
+        req.network_id == "bangalore_metro"
+        or any(d.asset_id.startswith("Edge_") for d in req.disruptions)
+    )
+
+    if is_metro:
+        active_nodes = BANGALORE_METRO_NODES
+        active_edges = BANGALORE_METRO_EDGES
+        active_crits = BANGALORE_METRO_CRITICAL_ASSETS
+        active_demands = BANGALORE_METRO_DEMANDS
+    else:
+        active_nodes = BENCHMARK_NODES
+        active_edges = BENCHMARK_EDGES
+        active_crits = BENCHMARK_CRITICAL_ASSETS
+        active_demands = DEFAULT_OD_DEMANDS
+
+    known_edge_ids = {e.id for e in active_edges}
     for d in req.disruptions:
         if d.asset_id not in known_edge_ids:
             raise HTTPException(
@@ -418,7 +521,24 @@ def run_simulation(req: SimulateRequest):
                 detail=f"Unknown asset_id: '{d.asset_id}' not present in network",
             )
 
-    net = _build_sim_network()
+    net_nodes = [
+        Node(id=n.id, latitude=n.latitude, longitude=n.longitude, node_type=n.node_type)
+        for n in active_nodes
+    ]
+    net_edges = [
+        Edge(
+            id=e.id,
+            source=e.source,
+            target=e.target,
+            length_km=e.length_km,
+            free_flow_speed_kmph=e.free_flow_speed_kmph,
+            nominal_capacity_veh_per_hour=e.nominal_capacity_veh_per_hour,
+            road_class=e.road_class,
+            baseline_flow_veh_per_hour=e.baseline_flow_veh_per_hour,
+        )
+        for e in active_edges
+    ]
+    net = RoadNetwork(nodes=net_nodes, edges=net_edges)
 
     # Map disruptions
     disruptions = [
@@ -431,7 +551,7 @@ def run_simulation(req: SimulateRequest):
     ]
 
     # Map demands
-    demands = DEFAULT_OD_DEMANDS
+    demands = active_demands
     if req.custom_demands:
         demands = [
             ODDemand(
@@ -445,7 +565,6 @@ def run_simulation(req: SimulateRequest):
             for od in req.custom_demands
         ]
 
-    # Critical assets
     crit_assets = [
         CriticalAsset(
             id=c.id,
@@ -453,7 +572,7 @@ def run_simulation(req: SimulateRequest):
             asset_type=c.asset_type,
             criticality_weight=c.criticality_weight,
         )
-        for c in BENCHMARK_CRITICAL_ASSETS
+        for c in active_crits
     ]
 
     cfg = SimulationConfig()
@@ -554,7 +673,9 @@ def run_simulation(req: SimulateRequest):
 
     for cr in changed_routes_out:
         if cr["rerouted"]:
-            explain_steps.append(f"{int(cr['demand_veh_per_hour'])} veh/h on trip {cr['origin']} → {cr['destination']} diverted onto alternate corridors, adding +{cr['extra_distance_km']:.1f} km.")
+            extra_dist = cr.get("extra_distance_km")
+            dist_str = f", adding +{extra_dist:.1f} km" if extra_dist is not None else ""
+            explain_steps.append(f"{int(cr['demand_veh_per_hour'])} veh/h on trip {cr['origin']} → {cr['destination']} diverted onto alternate corridors{dist_str}.")
         elif cr["unserved"]:
             explain_steps.append(f"Trip {cr['origin']} → {cr['destination']} lost all connectivity (unserved).")
 

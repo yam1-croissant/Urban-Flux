@@ -1,36 +1,33 @@
-import React, { useState, useEffect, useCallback } from "react";
 import {
-  NetworkResponse,
-  ScenarioPreset,
-  DisruptionInput,
-  SimulationResult,
-  ComparisonResult,
-} from "./types";
+    Activity,
+    Compass,
+    Layers,
+    RotateCcw,
+    Scale,
+    Zap
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  fetchNetwork,
-  fetchPresets,
-  simulateScenario,
-  compareScenarios,
+    compareScenarios,
+    fetchNetwork,
+    fetchPresets,
+    simulateScenario,
 } from "./api/client";
 import { BirdseyeMap } from "./components/BirdseyeMap";
-import { DisruptionStudio } from "./components/DisruptionStudio";
 import { CascadeTimeline } from "./components/CascadeTimeline";
-import { ImpactDashboard } from "./components/ImpactDashboard";
-import { ExplainabilityPanel } from "./components/ExplainabilityPanel";
 import { CriticalityRankPanel } from "./components/CriticalityRankPanel";
+import { DisruptionStudio } from "./components/DisruptionStudio";
+import { ExplainabilityPanel } from "./components/ExplainabilityPanel";
+import { ImpactDashboard } from "./components/ImpactDashboard";
+import { RealBangaloreMap } from "./components/RealBangaloreMap";
 import { ScenarioComparisonModal } from "./components/ScenarioComparisonModal";
 import {
-  Activity,
-  Zap,
-  Play,
-  RotateCcw,
-  Scale,
-  Shield,
-  Layers,
-  Flame,
-  Radio,
-  Wifi,
-} from "lucide-react";
+    ComparisonResult,
+    DisruptionInput,
+    NetworkResponse,
+    ScenarioPreset,
+    SimulationResult,
+} from "./types";
 
 export const App: React.FC = () => {
   const [network, setNetwork] = useState<NetworkResponse | null>(null);
@@ -42,6 +39,7 @@ export const App: React.FC = () => {
   const [isCompareOpen, setIsCompareOpen] = useState<boolean>(false);
   const [comparisonResult, setComparisonResult] = useState<ComparisonResult | null>(null);
   const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
+  const [mapMode, setMapMode] = useState<"real_map" | "schematic">("real_map");
 
   // Initialize network and presets
   useEffect(() => {
@@ -205,6 +203,33 @@ export const App: React.FC = () => {
         </div>
 
         {/* Center/Right: Action Controls */}
+        {/* Center: Map View Mode Switcher */}
+        <div className="hidden md:flex items-center bg-slate-900/90 border border-slate-800 p-1 rounded-xl shadow-inner">
+          <button
+            onClick={() => setMapMode("real_map")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              mapMode === "real_map"
+                ? "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>🗺️ Real Bangalore Map</span>
+          </button>
+          <button
+            onClick={() => setMapMode("schematic")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              mapMode === "schematic"
+                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>⚡ Schematic Twin</span>
+          </button>
+        </div>
+
+        {/* Right: Action Controls */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={handleRunDemo}
@@ -252,18 +277,32 @@ export const App: React.FC = () => {
         </div>
 
         {/* Center Column: Bird's-Eye Digital Twin Map & Impact Dashboard (Col Span 6) */}
+        {/* Center Column: Bird's-Eye Map (Real Bangalore / Schematic) & Impact Dashboard (Col Span 6) */}
         <div className="lg:col-span-6 flex flex-col gap-4">
-          {/* Interactive Digital Twin SVG Map */}
-          <div className="flex-1 min-h-[500px]">
-            <BirdseyeMap
-              nodes={network?.nodes || []}
-              edges={network?.edges || []}
-              criticalAssets={network?.critical_assets || []}
-              simulationResult={simulationResult}
-              selectedEdgeId={selectedEdgeId}
-              onSelectEdge={setSelectedEdgeId}
-              onQuickToggleDisruption={handleQuickToggleDisruption}
-            />
+          {/* Interactive Map View */}
+          <div className="flex-1 min-h-[520px]">
+            {mapMode === "real_map" ? (
+              <RealBangaloreMap
+                nodes={network?.nodes || []}
+                edges={network?.edges || []}
+                criticalAssets={network?.critical_assets || []}
+                pois={network?.pois || []}
+                simulationResult={simulationResult}
+                selectedEdgeId={selectedEdgeId}
+                onSelectEdge={setSelectedEdgeId}
+                onQuickToggleDisruption={handleQuickToggleDisruption}
+              />
+            ) : (
+              <BirdseyeMap
+                nodes={network?.nodes || []}
+                edges={network?.edges || []}
+                criticalAssets={network?.critical_assets || []}
+                simulationResult={simulationResult}
+                selectedEdgeId={selectedEdgeId}
+                onSelectEdge={setSelectedEdgeId}
+                onQuickToggleDisruption={handleQuickToggleDisruption}
+              />
+            )}
           </div>
 
           {/* Real-time Metric KPI Dashboard */}
