@@ -1,4 +1,4 @@
-"""UrbanResilience — FastAPI Simulation Backend & Digital Twin Server."""
+"""UrbanFlux — FastAPI Simulation Backend & Digital Twin Server."""
 
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ from backend.bangalore_data import (
 )
 
 app = FastAPI(
-    title="UrbanResilience Digital Twin API",
+    title="UrbanFlux Digital Twin API",
     description="Deterministic traffic disruption, cascading overload, and critical facility accessibility simulation API.",
     version="1.0.0",
 )
@@ -349,7 +349,7 @@ def health_check():
 def root_sitemap():
     return {
         "status": "online",
-        "service": "UrbanResilience Digital Twin API",
+        "service": "UrbanFlux Digital Twin API",
         "version": "1.0.0",
         "endpoints": {
             "network": "/api/network",
