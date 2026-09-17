@@ -18,32 +18,35 @@ $$\text{Primary Hazard} \longrightarrow \text{Capacity Reduction } (r) \longrigh
 
 The entire application runs locally without external cloud dependencies, API keys, or database configurations.
 
-### Prerequisites
-- Python 3.10+ (with packages in `./lib` or virtual environment)
-- Any modern web browser (Chrome, Firefox, Edge, Safari)
-
-### Step 1: Start the Backend Server (Terminal 1)
-From the repository root:
-
+### Clone the Repository
+Clone the repository at the `backupbackup` branch:
 ```bash
-PYTHONPATH=./lib:. python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+git clone -b backupbackup https://github.com/yam1-croissant/infrastructure-cascading.git
+cd infrastructure-cascading
 ```
 
+### Install Dependencies
+```bash
+pip install -r requirements.txt
+cd frontend && npm install && cd ..
+```
+
+### Run on 2 Separate Terminals
+
+#### Terminal 1: Start Backend API Server
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+```
 - **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
 - **Interactive Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### Step 2: Open the Interactive Digital Twin UI (Terminal 2)
-The frontend is already built in `frontend/dist`. You can serve it directly:
-
+#### Terminal 2: Start Frontend Interface
 ```bash
-cd frontend/dist
-python3 -m http.server 5173
+npm --prefix frontend run dev
 ```
 
-Open your browser to:
-👉 **[http://localhost:5173](http://localhost:5173)**
-
-*(Alternatively, if running the Vite development server with Node.js: `cd frontend && npm run dev`).*
+#### Finally open in your browser:
+👉 **[http://localhost:5173/](http://localhost:5173/)**
 
 ---
 
