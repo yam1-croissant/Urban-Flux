@@ -62,7 +62,7 @@ export const App: React.FC = () => {
       setSimulationResult(res);
 
       // Check first-time visitor status for interactive user guide
-      const tourComplete = localStorage.getItem("urbanresilience_onboarding_complete");
+      const tourComplete = localStorage.getItem("urbanflux_onboarding_complete");
       if (!tourComplete) {
         setIsGuideOpen(true);
       }
@@ -212,7 +212,7 @@ export const App: React.FC = () => {
 
   // Guide completion handler
   const handleFinishGuide = useCallback(() => {
-    localStorage.setItem("urbanresilience_onboarding_complete", "true");
+    localStorage.setItem("urbanflux_onboarding_complete", "true");
     setIsGuideOpen(false);
     setShowReadyToast(true);
     setTimeout(() => {
@@ -239,7 +239,7 @@ export const App: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold tracking-wider uppercase bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                UrbanResilience Sim
+                UrbanFlux
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold tracking-wide">
                 v2.5 DIGITAL TWIN

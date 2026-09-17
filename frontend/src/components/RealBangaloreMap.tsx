@@ -100,7 +100,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
   const [isRoutingRoads, setIsRoutingRoads] = useState(false);
   const [cartoApiKey, setCartoApiKey] = useState<string>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("urbanresilience_carto_api_key") || "";
+      return localStorage.getItem("urbanflux_carto_api_key") || "";
     }
     return "";
   });
@@ -111,9 +111,9 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
     const trimmed = tempKey.trim();
     setCartoApiKey(trimmed);
     if (trimmed) {
-      localStorage.setItem("urbanresilience_carto_api_key", trimmed);
+      localStorage.setItem("urbanflux_carto_api_key", trimmed);
     } else {
-      localStorage.removeItem("urbanresilience_carto_api_key");
+      localStorage.removeItem("urbanflux_carto_api_key");
     }
     setShowKeyModal(false);
   };
@@ -121,7 +121,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
   const handleRemoveKey = () => {
     setTempKey("");
     setCartoApiKey("");
-    localStorage.removeItem("urbanresilience_carto_api_key");
+    localStorage.removeItem("urbanflux_carto_api_key");
     setShowKeyModal(false);
   };
 
@@ -163,7 +163,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
       const endpoints = getEndpoints(edge);
       if (endpoints.length < 2) return null;
 
-      const cacheKey = `urbanresilience-road-route-${edge.id}-${endpoints.flat().join("-")}`;
+      const cacheKey = `urbanflux-road-route-${edge.id}-${endpoints.flat().join("-")}`;
       const cached = sessionStorage.getItem(cacheKey);
       if (cached) return [edge.id, JSON.parse(cached) as [number, number][]];
 
@@ -631,7 +631,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
                 CARTO basemaps display an <strong>&quot;API KEY REQUIRED&quot;</strong> watermark unless an API key is provided.
               </p>
               <p>
-                Without a key, UrbanResilience automatically applies an unwatermarked dark filter so you can use Dark Matter with zero watermark.
+                Without a key, UrbanFlux automatically applies an unwatermarked dark filter so you can use Dark Matter with zero watermark.
               </p>
               <p>
                 To enable official CARTO vector/raster tiles without any watermark, you can request a <strong>free API key</strong> (up to 5,000,000 requests/month):
