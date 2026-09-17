@@ -1,0 +1,178 @@
+[
+  {
+    "area": "Electronic City",
+    "road": "Hosur Road",
+    "mean_volume": 16557.2,
+    "mean_speed": 44.0,
+    "mean_congestion": 55.2,
+    "mean_utilization": 77.6,
+    "mean_tti": 1.23,
+    "mean_incidents": 0.76,
+    "total_observations": 277
+  },
+  {
+    "area": "Electronic City",
+    "road": "Silk Board Junction",
+    "mean_volume": 16134.5,
+    "mean_speed": 43.3,
+    "mean_congestion": 53.7,
+    "mean_utilization": 74.9,
+    "mean_tti": 1.23,
+    "mean_incidents": 0.8,
+    "total_observations": 275
+  },
+  {
+    "area": "Hebbal",
+    "road": "Ballari Road",
+    "mean_volume": 26272.6,
+    "mean_speed": 40.0,
+    "mean_congestion": 79.5,
+    "mean_utilization": 92.6,
+    "mean_tti": 1.36,
+    "mean_incidents": 1.6,
+    "total_observations": 476
+  },
+  {
+    "area": "Hebbal",
+    "road": "Hebbal Flyover",
+    "mean_volume": 26794.9,
+    "mean_speed": 40.3,
+    "mean_congestion": 80.7,
+    "mean_utilization": 92.8,
+    "mean_tti": 1.37,
+    "mean_incidents": 1.53,
+    "total_observations": 474
+  },
+  {
+    "area": "Indiranagar",
+    "road": "100 Feet Road",
+    "mean_volume": 31956.9,
+    "mean_speed": 38.4,
+    "mean_congestion": 87.1,
+    "mean_utilization": 95.7,
+    "mean_tti": 1.4,
+    "mean_incidents": 1.8,
+    "total_observations": 860
+  },
+  {
+    "area": "Indiranagar",
+    "road": "CMH Road",
+    "mean_volume": 32611.9,
+    "mean_speed": 38.9,
+    "mean_congestion": 88.2,
+    "mean_utilization": 95.8,
+    "mean_tti": 1.41,
+    "mean_incidents": 1.75,
+    "total_observations": 860
+  },
+  {
+    "area": "Jayanagar",
+    "road": "Jayanagar 4th Block",
+    "mean_volume": 24496.2,
+    "mean_speed": 40.1,
+    "mean_congestion": 76.7,
+    "mean_utilization": 91.5,
+    "mean_tti": 1.35,
+    "mean_incidents": 1.45,
+    "total_observations": 580
+  },
+  {
+    "area": "Jayanagar",
+    "road": "South End Circle",
+    "mean_volume": 24704.1,
+    "mean_speed": 39.4,
+    "mean_congestion": 77.3,
+    "mean_utilization": 91.5,
+    "mean_tti": 1.36,
+    "mean_incidents": 1.52,
+    "total_observations": 593
+  },
+  {
+    "area": "Koramangala",
+    "road": "Sarjapur Road",
+    "mean_volume": 40189.9,
+    "mean_speed": 36.1,
+    "mean_congestion": 93.8,
+    "mean_utilization": 97.4,
+    "mean_tti": 1.47,
+    "mean_incidents": 1.88,
+    "total_observations": 680
+  },
+  {
+    "area": "Koramangala",
+    "road": "Sony World Junction",
+    "mean_volume": 41470.8,
+    "mean_speed": 36.0,
+    "mean_congestion": 94.1,
+    "mean_utilization": 97.5,
+    "mean_tti": 1.47,
+    "mean_incidents": 1.81,
+    "total_observations": 684
+  },
+  {
+    "area": "M.G. Road",
+    "road": "Anil Kumble Circle",
+    "mean_volume": 35251.8,
+    "mean_speed": 37.4,
+    "mean_congestion": 90.8,
+    "mean_utilization": 96.6,
+    "mean_tti": 1.44,
+    "mean_incidents": 1.81,
+    "total_observations": 759
+  },
+  {
+    "area": "M.G. Road",
+    "road": "Trinity Circle",
+    "mean_volume": 35350.1,
+    "mean_speed": 37.7,
+    "mean_congestion": 90.4,
+    "mean_utilization": 96.5,
+    "mean_tti": 1.44,
+    "mean_incidents": 1.92,
+    "total_observations": 742
+  },
+  {
+    "area": "Whitefield",
+    "road": "ITPL Main Road",
+    "mean_volume": 21866.0,
+    "mean_speed": 42.0,
+    "mean_congestion": 71.1,
+    "mean_utilization": 88.3,
+    "mean_tti": 1.3,
+    "mean_incidents": 1.34,
+    "total_observations": 450
+  },
+  {
+    "area": "Whitefield",
+    "road": "Marathahalli Bridge",
+    "mean_volume": 20773.0,
+    "mean_speed": 42.3,
+    "mean_congestion": 67.2,
+    "mean_utilization": 85.5,
+    "mean_tti": 1.29,
+    "mean_incidents": 1.22,
+    "total_observations": 492
+  },
+  {
+    "area": "Yeshwanthpur",
+    "road": "Tumkur Road",
+    "mean_volume": 18574.5,
+    "mean_speed": 43.9,
+    "mean_congestion": 60.9,
+    "mean_utilization": 82.2,
+    "mean_tti": 1.26,
+    "mean_incidents": 1.02,
+    "total_observations": 361
+  },
+  {
+    "area": "Yeshwanthpur",
+    "road": "Yeshwanthpur Circle",
+    "mean_volume": 19277.1,
+    "mean_speed": 43.0,
+    "mean_congestion": 63.7,
+    "mean_utilization": 82.6,
+    "mean_tti": 1.27,
+    "mean_incidents": 1.14,
+    "total_observations": 373
+  }
+]

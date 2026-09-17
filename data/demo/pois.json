@@ -1,0 +1,58 @@
+{
+  "network_id": "demo_city",
+  "provenance": {
+    "locations": "OBSERVED / Bengaluru Civic Infrastructure",
+    "criticality_weights": "MODELED / Urban Emergency Resilience Framework"
+  },
+  "pois": [
+    {
+      "id": "Hospital_C",
+      "name": "Manipal City Hospital (Level-1 Trauma Center)",
+      "asset_type": "hospital",
+      "node_id": "Hospital_C",
+      "latitude": 12.9592,
+      "longitude": 77.6499,
+      "criticality_weight": 2.5,
+      "service_population": 180000,
+      "max_acceptable_delay_minutes": 5.0,
+      "description": "Primary regional trauma and emergency cardiac treatment facility serving east-central Bengaluru."
+    },
+    {
+      "id": "Fire_Station_ZoneA",
+      "name": "Indiranagar Fire & Emergency Station",
+      "asset_type": "fire_station",
+      "node_id": "Zone_A",
+      "latitude": 12.9784,
+      "longitude": 77.6408,
+      "criticality_weight": 2.0,
+      "service_population": 120000,
+      "max_acceptable_delay_minutes": 4.0,
+      "description": "Emergency rapid-response station dispatching fire engines and basic life support ambulances."
+    },
+    {
+      "id": "Transit_Hub_Domlur",
+      "name": "Domlur TTMC Public Transit Hub",
+      "asset_type": "transit_hub",
+      "node_id": "Junction_B",
+      "latitude": 12.9610,
+      "longitude": 77.6430,
+      "criticality_weight": 1.5,
+      "service_population": 95000,
+      "max_acceptable_delay_minutes": 10.0,
+      "description": "BMTC major multi-modal transit bus interchange connecting east and south radial corridors."
+    },
+    {
+      "id": "Tech_Park_Koramangala",
+      "name": "Koramangala Commercial Technology Park",
+      "asset_type": "commercial_hub",
+      "node_id": "Zone_D",
+      "latitude": 12.9345,
+      "longitude": 77.6258,
+      "criticality_weight": 1.2,
+      "service_population": 65000,
+      "max_acceptable_delay_minutes": 15.0,
+      "description": "Major employment center generating daily peak inbound and outbound commuter flows."
+    }
+  ]
+}
+

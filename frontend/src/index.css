@@ -1,0 +1,152 @@
+@import "leaflet/dist/leaflet.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #070B14;
+  color: #F1F5F9;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* The dashboard intentionally exceeds one viewport on laptops. Keep the
+     page scrollable instead of requiring browser zoom to reach lower panels. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  user-select: none;
+}
+
+/* Custom Leaflet Dark Mode Styling */
+.leaflet-container {
+  background-color: #070B14 !important;
+  font-family: inherit;
+  outline: none;
+}
+
+/* High-Contrast Watermark-Free Dark Mode Filter for Map Tiles */
+.dark-mode-tiles .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: #0f172a !important;
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid rgba(51, 65, 85, 0.8) !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background: rgba(15, 23, 42, 0.9) !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.8) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background: #1e293b !important;
+  color: #38bdf8 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(15, 23, 42, 0.75) !important;
+  color: #64748b !important;
+  font-size: 9px !important;
+  backdrop-filter: blur(6px) !important;
+}
+
+.leaflet-control-attribution a {
+  color: #0284c7 !important;
+}
+
+/* Custom glowing effects */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+}
+
+.glow-rose {
+  box-shadow: 0 0 25px rgba(244, 63, 94, 0.45);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+}
+
+/* Animated traffic flow pulse */
+@keyframes flowDash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+.animate-flow-dash {
+  animation: flowDash 1.2s linear infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B1120;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}

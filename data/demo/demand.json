@@ -1,0 +1,55 @@
+{
+  "network_id": "demo_city",
+  "provenance": "SYNTHETIC / Hackathon Commuter Distribution",
+  "time_periods": {
+    "weekday_rush_hour": {
+      "name": "Morning Peak Hour (08:30 - 10:30)",
+      "multiplier": 1.0,
+      "demands": [
+        {
+          "id": "OD_ZoneA_ZoneD",
+          "name": "Indiranagar Commuters -> Koramangala Tech Hub",
+          "origin": "Zone_A",
+          "destination": "Zone_D",
+          "demand_veh_per_hour": 1200.0,
+          "time_period": "peak",
+          "vehicle_class": "mixed"
+        },
+        {
+          "id": "OD_ZoneA_Hospital",
+          "name": "Emergency & Patient Inflow -> Manipal Hospital",
+          "origin": "Zone_A",
+          "destination": "Hospital_C",
+          "demand_veh_per_hour": 600.0,
+          "time_period": "peak",
+          "vehicle_class": "mixed"
+        }
+      ]
+    },
+    "off_peak": {
+      "name": "Midday Off-Peak (13:00 - 15:00)",
+      "multiplier": 0.45,
+      "demands": [
+        {
+          "id": "OD_ZoneA_ZoneD",
+          "name": "Indiranagar Commuters -> Koramangala Tech Hub",
+          "origin": "Zone_A",
+          "destination": "Zone_D",
+          "demand_veh_per_hour": 540.0,
+          "time_period": "off_peak",
+          "vehicle_class": "mixed"
+        },
+        {
+          "id": "OD_ZoneA_Hospital",
+          "name": "Emergency & Patient Inflow -> Manipal Hospital",
+          "origin": "Zone_A",
+          "destination": "Hospital_C",
+          "demand_veh_per_hour": 270.0,
+          "time_period": "off_peak",
+          "vehicle_class": "mixed"
+        }
+      ]
+    }
+  }
+}
+

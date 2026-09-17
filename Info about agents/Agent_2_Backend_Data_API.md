@@ -567,7 +567,7 @@ all work using local demo data.
 # 17. Antigravity Pro Prompt
 
 ```text
-You are Agent 2 for UrbanResilience Sim.
+You are Agent 2 for UrbanFlux Sim.
 
 Own only:
 - FastAPI
