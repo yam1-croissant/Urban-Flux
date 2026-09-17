@@ -1,17 +1,20 @@
 import L from "leaflet";
 import {
-    Compass,
-    RotateCcw,
-    ZoomIn,
-    ZoomOut
+  Compass,
+  ExternalLink,
+  Key,
+  RotateCcw,
+  X,
+  ZoomIn,
+  ZoomOut
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    CriticalAssetData,
-    EdgeData,
-    NodeData,
-    POIData,
-    SimulationResult,
+  CriticalAssetData,
+  EdgeData,
+  NodeData,
+  POIData,
+  SimulationResult,
 } from "../types";
 
 interface RealBangaloreMapProps {
@@ -28,31 +31,47 @@ interface RealBangaloreMapProps {
 type TileProvider = "carto_dark" | "satellite" | "osm";
 type RoadGeometry = Record<string, [number, number][]>;
 
-const TILE_LAYERS: Record<
-  TileProvider,
-  { url: string; attribution: string; name: string; subdomains: string; maxZoom: number }
-> = {
-  satellite: {
-    name: "Satellite",
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Earthstar Geographics',
-    subdomains: "",
-    maxZoom: 19,
-  },
-  carto_dark: {
+export const getTileConfig = (tp: TileProvider, apiKey?: string) => {
+  if (tp === "satellite") {
+    return {
+      name: "Satellite",
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Earthstar Geographics',
+      subdomains: "",
+      maxZoom: 19,
+      className: "",
+    };
+  }
+  if (tp === "osm") {
+    return {
+      name: "Street Map",
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      subdomains: "abc",
+      maxZoom: 19,
+      className: "",
+    };
+  }
+  // Dark Matter
+  if (apiKey && apiKey.trim().length > 0) {
+    return {
+      name: "Dark Matter",
+      url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png?api_key=${encodeURIComponent(apiKey.trim())}`,
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OSM</a>',
+      subdomains: "abcd",
+      maxZoom: 20,
+      className: "",
+    };
+  }
+  // Default Dark Matter without API key: uses clean CSS-inverted dark tiles with NO watermark!
+  return {
     name: "Dark Matter",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OSM</a>',
-    subdomains: "abcd",
-    maxZoom: 20,
-  },
-  osm: {
-    name: "Street Map",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    subdomains: "abc", // OpenStreetMap only has a, b, c. "d" causes DNS errors resulting in black square voids!
+    subdomains: "abc",
     maxZoom: 19,
-  },
+    className: "dark-mode-tiles",
+  };
 };
 
 // Bengaluru default center
@@ -79,6 +98,32 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [roadGeometries, setRoadGeometries] = useState<RoadGeometry>({});
   const [isRoutingRoads, setIsRoutingRoads] = useState(false);
+  const [cartoApiKey, setCartoApiKey] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("urbanresilience_carto_api_key") || "";
+    }
+    return "";
+  });
+  const [showKeyModal, setShowKeyModal] = useState<boolean>(false);
+  const [tempKey, setTempKey] = useState<string>("");
+
+  const handleSaveKey = () => {
+    const trimmed = tempKey.trim();
+    setCartoApiKey(trimmed);
+    if (trimmed) {
+      localStorage.setItem("urbanresilience_carto_api_key", trimmed);
+    } else {
+      localStorage.removeItem("urbanresilience_carto_api_key");
+    }
+    setShowKeyModal(false);
+  };
+
+  const handleRemoveKey = () => {
+    setTempKey("");
+    setCartoApiKey("");
+    localStorage.removeItem("urbanresilience_carto_api_key");
+    setShowKeyModal(false);
+  };
 
   const nodeMap = useMemo(() => {
     const map = new Map<string, NodeData>();
@@ -173,11 +218,12 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
       maxZoom: 18,
     });
 
-    const tileConfig = TILE_LAYERS[activeTile];
+    const tileConfig = getTileConfig(activeTile, cartoApiKey);
     const tileLayer = L.tileLayer(tileConfig.url, {
       attribution: tileConfig.attribution,
       subdomains: tileConfig.subdomains,
       maxZoom: tileConfig.maxZoom,
+      className: tileConfig.className,
     }).addTo(map);
 
     tileLayerRef.current = tileLayer;
@@ -195,21 +241,22 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
     };
   }, []);
 
-  // Update Tile Layer when user switches
+  // Update Tile Layer when user switches layer or changes API key
   useEffect(() => {
     if (!mapInstanceRef.current || !tileLayerRef.current) return;
-    const tileConfig = TILE_LAYERS[activeTile];
+    const tileConfig = getTileConfig(activeTile, cartoApiKey);
     mapInstanceRef.current.removeLayer(tileLayerRef.current);
 
     const newTileLayer = L.tileLayer(tileConfig.url, {
       attribution: tileConfig.attribution,
       subdomains: tileConfig.subdomains,
       maxZoom: tileConfig.maxZoom,
+      className: tileConfig.className,
     }).addTo(mapInstanceRef.current);
 
     tileLayerRef.current = newTileLayer;
     newTileLayer.bringToBack();
-  }, [activeTile]);
+  }, [activeTile, cartoApiKey]);
 
   // Render Polylines and Dynamic Flows
   useEffect(() => {
@@ -500,7 +547,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
       {/* Layer Switcher & Map Controls (Top-Right) */}
       <div className="absolute top-3 right-3 z-[400] flex items-center gap-2">
         {/* Layer Selector */}
-        <div className="flex items-center bg-[#0F172A]/90 backdrop-blur-xl border border-slate-800 p-1 rounded-xl shadow-2xl">
+        <div className="flex items-center bg-[#0F172A]/90 backdrop-blur-xl border border-slate-800 p-1 rounded-xl shadow-2xl gap-1">
           {(["carto_dark", "satellite", "osm"] as TileProvider[]).map((tp) => (
             <button
               key={tp}
@@ -511,9 +558,26 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              {TILE_LAYERS[tp].name}
+              {tp === "carto_dark" ? "Dark Matter" : tp === "satellite" ? "Satellite" : "Street Map"}
             </button>
           ))}
+
+          {/* API Key Modal Button */}
+          <button
+            onClick={() => {
+              setTempKey(cartoApiKey);
+              setShowKeyModal(true);
+            }}
+            className={`px-2 py-1 text-[10px] font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
+              cartoApiKey
+                ? "text-emerald-400 bg-emerald-500/10 border border-emerald-500/30"
+                : "text-slate-400 hover:text-white hover:bg-slate-800"
+            }`}
+            title={cartoApiKey ? "CARTO API Key Active" : "Add CARTO API Key"}
+          >
+            <Key className="w-3 h-3 text-cyan-400" />
+            <span>{cartoApiKey ? "Key ✓" : "Key"}</span>
+          </button>
         </div>
 
         {/* Zoom & Reset Buttons */}
@@ -544,6 +608,83 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
 
       {/* Real Map Leaflet Container */}
       <div ref={mapContainerRef} className="w-full h-full flex-1 z-0" />
+
+      {/* CARTO API Key Setup Modal */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4 text-slate-100 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white">CARTO Basemap API Key</h3>
+              </div>
+              <button
+                onClick={() => setShowKeyModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="text-xs text-slate-300 space-y-2.5 leading-relaxed">
+              <p>
+                CARTO basemaps display an <strong>&quot;API KEY REQUIRED&quot;</strong> watermark unless an API key is provided.
+              </p>
+              <p>
+                Without a key, UrbanResilience automatically applies an unwatermarked dark filter so you can use Dark Matter with zero watermark.
+              </p>
+              <p>
+                To enable official CARTO vector/raster tiles without any watermark, you can request a <strong>free API key</strong> (up to 5,000,000 requests/month):
+              </p>
+              <a
+                href="https://carto.com/basemaps/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/25 font-semibold transition-colors"
+              >
+                <span>Request Free CARTO Key at carto.com</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <div className="space-y-1.5 pt-1">
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                Enter Your CARTO API Key
+              </label>
+              <input
+                type="text"
+                value={tempKey}
+                onChange={(e) => setTempKey(e.target.value)}
+                placeholder="Paste your CARTO API key here"
+                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-white focus:outline-none focus:border-cyan-400"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+              {cartoApiKey && (
+                <button
+                  onClick={handleRemoveKey}
+                  className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-colors mr-auto"
+                >
+                  Remove Key
+                </button>
+              )}
+              <button
+                onClick={() => setShowKeyModal(false)}
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveKey}
+                className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs shadow-lg transition-all"
+              >
+                Save & Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Floating Map Legend */}
       <div className="absolute bottom-3 left-3 z-[400] bg-[#0F172A]/90 backdrop-blur-xl border border-slate-800 px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-4 text-[11px] text-slate-300">
