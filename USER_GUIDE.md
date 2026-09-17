@@ -8,19 +8,27 @@ The complete, illustrated User Guide with high-resolution screenshots and detail
 
 ## Quick Launch Summary
 
-### 1. Start the Backend API (Terminal 1)
+Clone the repository at the `backupbackup` branch:
 ```bash
-PYTHONPATH=./lib:. python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+git clone -b backupbackup https://github.com/yam1-croissant/infrastructure-cascading.git
+cd infrastructure-cascading
+```
+
+Run on 2 separate terminals:
+
+### Terminal 1 (Backend API Server):
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 - Interactive Swagger UI: [http://localhost:8000/docs](http://localhost:8000/docs)
 - Health Check: [http://localhost:8000/health](http://localhost:8000/health)
 
-### 2. Launch the Digital Twin Map Interface (Terminal 2)
+### Terminal 2 (Frontend Client):
 ```bash
-cd frontend/dist
-python3 -m http.server 5173
+npm --prefix frontend run dev
 ```
-- Open Browser to: 👉 **[http://localhost:5173](http://localhost:5173)**
+
+Finally open **[http://localhost:5173/](http://localhost:5173/)** on your browser.
 
 ---
 

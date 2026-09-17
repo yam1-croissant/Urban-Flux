@@ -1,4 +1,18 @@
+# Python
 __pycache__/
 *.pyc
 .pytest_cache/
 lib/
+.venv/
+venv/
+
+# Frontend / Node
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/

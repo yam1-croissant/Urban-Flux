@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: urbanflux-backend-dev
+    command: ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes:
+      - ./backend:/app/backend
+      - ./src:/app/src
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+    environment:
+      - URBAN_HOST=0.0.0.0
+      - URBAN_PORT=8000
+      - URBAN_DEBUG=true
+    networks:
+      - urbanflux-dev-network
+
+  frontend:
+    image: node:20-alpine
+    container_name: urbanflux-frontend-dev
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://backend:8000
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - backend
+    networks:
+      - urbanflux-dev-network
+
+networks:
+  urbanflux-dev-network:
+    driver: bridge
+
