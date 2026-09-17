@@ -112,6 +112,7 @@ export interface ScenarioPreset {
   name: string;
   description: string;
   icon: string;
+  category?: "monsoon" | "construction" | "closure" | "events" | "emergency";
   disruptions: DisruptionInput[];
   recommended_mitigation_id?: string;
 }

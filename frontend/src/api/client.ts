@@ -214,34 +214,84 @@ const MOCK_NETWORK: NetworkResponse = {
 const MOCK_PRESETS: ScenarioPreset[] = [
   {
     id: "bridge_closure",
-    name: "Bridge Structural Closure",
+    name: "Silk Board Bridge Inspection Closure",
     description: "Acute 100% closure of Silk Board Bridge due to structural inspection.",
     icon: "AlertTriangle",
+    category: "closure",
     disruptions: [{ asset_id: "Bridge_A_B", disruption_type: "closure", capacity_multiplier: 0.0 }],
     recommended_mitigation_id: "mitigation_reroute"
   },
   {
+    id: "scenario_silk_board_collapse",
+    name: "Silk Board Elevated Flyover Structural Closure",
+    description: "Acute 100% shutdown of Silk Board Elevated Highway. Diverts 5,000+ veh/h onto BTM & Koramangala.",
+    icon: "AlertTriangle",
+    category: "closure",
+    disruptions: [{ asset_id: "Edge_SilkBoard_Hosur", disruption_type: "closure", capacity_multiplier: 0.0 }],
+    recommended_mitigation_id: "scenario_green_corridor_mitigation"
+  },
+  {
     id: "monsoon_flooding",
-    name: "Monsoon Flash Flooding",
+    name: "Central Arterial Flash Waterlogging",
     description: "50% capacity loss on primary corridors due to heavy waterlogging.",
     icon: "CloudRain",
+    category: "monsoon",
     disruptions: [
       { asset_id: "Bridge_A_B", disruption_type: "weather", capacity_multiplier: 0.5 },
       { asset_id: "Bottleneck_E_F", disruption_type: "weather", capacity_multiplier: 0.5 }
     ]
   },
   {
+    id: "scenario_bellandur_flood",
+    name: "Bellandur ORR & Sarjapur Flash Flood",
+    description: "Heavy 60mm/hr monsoon downpour cuts Outer Ring Road capacity by 60%.",
+    icon: "CloudRain",
+    category: "monsoon",
+    disruptions: [
+      { asset_id: "Edge_Sarjapur_Bellandur", disruption_type: "weather", capacity_multiplier: 0.4 },
+      { asset_id: "Edge_Bellandur_Marathahalli", disruption_type: "weather", capacity_multiplier: 0.4 }
+    ]
+  },
+  {
     id: "metro_construction",
-    name: "Metro Line 3 Construction",
+    name: "Inner Ring Road Metro Line 3 Works",
     description: "Single lane blockage on Inner Ring Road approach reducing throughput by 35%.",
     icon: "Construction",
+    category: "construction",
     disruptions: [{ asset_id: "Arterial_B_C", disruption_type: "construction", capacity_multiplier: 0.65 }]
+  },
+  {
+    id: "scenario_mg_road_construction",
+    name: "Namma Metro Line 6 Construction (MG Road & Trinity)",
+    description: "Barricaded arterial lanes reduce throughput by 50% along Trinity Circle & Anil Kumble Circle.",
+    icon: "Construction",
+    category: "construction",
+    disruptions: [{ asset_id: "Edge_Trinity_AnilKumble", disruption_type: "construction", capacity_multiplier: 0.5 }]
+  },
+  {
+    id: "scenario_itpl_summit",
+    name: "ITPL Tech Summit Peak Hour Surge",
+    description: "Major global tech convention in Whitefield creates 35% commuter surge on Old Airport Road.",
+    icon: "Zap",
+    category: "events",
+    disruptions: [
+      { asset_id: "Arterial_C_D", disruption_type: "partial_closure", capacity_multiplier: 0.75 }
+    ]
   },
   {
     id: "mitigation_reroute",
     name: "Active Police Rerouting & Relief Lane",
     description: "Deployment of traffic wardens and dedicated signal green-waves on North Relief corridor.",
     icon: "ShieldCheck",
+    category: "emergency",
+    disruptions: []
+  },
+  {
+    id: "scenario_green_corridor_mitigation",
+    name: "Active Traffic Police Emergency Green Wave",
+    description: "Traffic wardens establish dedicated priority green-waves for Manipal, Victoria, and NIMHANS ambulances.",
+    icon: "ShieldCheck",
+    category: "emergency",
     disruptions: []
   }
 ];

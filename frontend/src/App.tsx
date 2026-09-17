@@ -1,10 +1,13 @@
 import {
     Activity,
+    Check,
     Compass,
+    HelpCircle,
     Layers,
     RotateCcw,
     Scale,
-    Zap
+    X,
+    Zap,
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -19,6 +22,8 @@ import { CriticalityRankPanel } from "./components/CriticalityRankPanel";
 import { DisruptionStudio } from "./components/DisruptionStudio";
 import { ExplainabilityPanel } from "./components/ExplainabilityPanel";
 import { ImpactDashboard } from "./components/ImpactDashboard";
+import { InteractiveUserGuide } from "./components/InteractiveUserGuide";
+import { LinkInspector } from "./components/LinkInspector";
 import { RealBangaloreMap } from "./components/RealBangaloreMap";
 import { ScenarioComparisonModal } from "./components/ScenarioComparisonModal";
 import {
@@ -41,6 +46,10 @@ export const App: React.FC = () => {
   const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
   const [mapMode, setMapMode] = useState<"real_map" | "schematic">("real_map");
 
+  // Onboarding tour and completion toast state
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
+  const [showReadyToast, setShowReadyToast] = useState<boolean>(false);
+
   // Initialize network and presets
   useEffect(() => {
     async function init() {
@@ -51,6 +60,12 @@ export const App: React.FC = () => {
       // Run initial baseline simulation
       const res = await simulateScenario({ disruptions: [] });
       setSimulationResult(res);
+
+      // Check first-time visitor status for interactive user guide
+      const tourComplete = localStorage.getItem("urbanresilience_onboarding_complete");
+      if (!tourComplete) {
+        setIsGuideOpen(true);
+      }
     }
     init();
   }, []);
@@ -86,6 +101,10 @@ export const App: React.FC = () => {
   // Apply a scenario preset
   const handleApplyPreset = useCallback((preset: ScenarioPreset) => {
     setActiveDisruptions(preset.disruptions);
+    // If preset targets specific edges, select the primary one for inspector
+    if (preset.disruptions.length > 0) {
+      setSelectedEdgeId(preset.disruptions[0].asset_id);
+    }
   }, []);
 
   // Quick toggle closure on an edge directly from map
@@ -100,6 +119,7 @@ export const App: React.FC = () => {
         { asset_id: edgeId, disruption_type: "closure", capacity_multiplier: 0.0 },
       ];
     });
+    setSelectedEdgeId(edgeId);
   }, []);
 
   // Run simulation against backend or local fallback
@@ -166,12 +186,46 @@ export const App: React.FC = () => {
     setIsCompareOpen(true);
   }, []);
 
+  // Guide step sync handler to adjust UI view or select representative link
+  const handleGuideStepChange = useCallback(
+    (stepIndex: number) => {
+      // Step 4 (index 3) or Step 5 (index 4): switch to schematic mode
+      if (stepIndex === 3) {
+        setMapMode("schematic");
+      }
+      // Step 3 (index 2), Step 5 (index 4), Step 6 (index 5): select a road if none active
+      if (stepIndex === 2 || stepIndex === 4 || stepIndex === 5) {
+        setSelectedEdgeId((prev) => {
+          if (!prev && network?.edges && network.edges.length > 0) {
+            const sample =
+              network.edges.find(
+                (e) => e.id === "Bridge_A_B" || e.id.includes("SilkBoard") || e.id.includes("Hosur")
+              ) || network.edges[0];
+            return sample.id;
+          }
+          return prev;
+        });
+      }
+    },
+    [network]
+  );
+
+  // Guide completion handler
+  const handleFinishGuide = useCallback(() => {
+    localStorage.setItem("urbanresilience_onboarding_complete", "true");
+    setIsGuideOpen(false);
+    setShowReadyToast(true);
+    setTimeout(() => {
+      setShowReadyToast(false);
+    }, 4500);
+  }, []);
+
   const selectedEdge =
     network?.edges.find((e) => e.id === selectedEdgeId) || null;
 
   return (
     <div className="min-h-screen bg-[#070B14] text-slate-100 flex flex-col font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
-      {/* Top Application Bar */}
+      {/* Top Application Header Bar */}
       <header className="h-16 border-b border-slate-800/80 bg-[#0F172A]/80 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-40 shadow-2xl">
         {/* Left: Branding & Digital Twin Status */}
         <div className="flex items-center gap-3.5">
@@ -184,11 +238,11 @@ export const App: React.FC = () => {
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black tracking-wider uppercase bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+              <h1 className="text-sm font-bold tracking-wider uppercase bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
                 UrbanResilience Sim
               </h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold tracking-wide">
-                v2.4 DIGITAL TWIN
+                v2.5 DIGITAL TWIN
               </span>
             </div>
             <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
@@ -202,12 +256,14 @@ export const App: React.FC = () => {
           </div>
         </div>
 
-        {/* Center/Right: Action Controls */}
         {/* Center: Map View Mode Switcher */}
-        <div className="hidden md:flex items-center bg-slate-900/90 border border-slate-800 p-1 rounded-xl shadow-inner">
+        <div
+          id="tour-map-view-modes"
+          className="hidden md:flex items-center bg-slate-900/90 border border-slate-800 p-1 rounded-xl shadow-inner"
+        >
           <button
             onClick={() => setMapMode("real_map")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               mapMode === "real_map"
                 ? "bg-gradient-to-r from-cyan-600 to-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
                 : "text-slate-400 hover:text-white"
@@ -217,8 +273,9 @@ export const App: React.FC = () => {
             <span>🗺️ Real Bangalore Map</span>
           </button>
           <button
+            id="tour-schematic-toggle"
             onClick={() => setMapMode("schematic")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               mapMode === "schematic"
                 ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]"
                 : "text-slate-400 hover:text-white"
@@ -234,18 +291,28 @@ export const App: React.FC = () => {
           <button
             onClick={handleRunDemo}
             disabled={isDemoRunning || isSimulating}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-bold text-xs shadow-[0_0_20px_rgba(244,63,94,0.35)] hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-semibold text-xs shadow-[0_0_20px_rgba(244,63,94,0.35)] hover:shadow-[0_0_25px_rgba(244,63,94,0.5)] transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Zap className="w-4 h-4 text-white fill-white animate-bounce" />
-            <span>{isDemoRunning ? "Replaying Domino Chain..." : "▶ Run Demo Scenario"}</span>
+            <span>{isDemoRunning ? "Replaying Domino Chain..." : "▶ Run Demo"}</span>
           </button>
 
           <button
+            id="tour-compare-policies"
             onClick={handleOpenCompare}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-semibold text-xs transition-all hover:border-cyan-500/40"
           >
             <Scale className="w-4 h-4 text-cyan-400" />
             <span>Compare Policies</span>
+          </button>
+
+          <button
+            onClick={() => setIsGuideOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-cyan-300 font-semibold text-xs transition-all hover:border-cyan-500/40"
+            title="Open Interactive Onboarding Guide"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Guide</span>
           </button>
 
           <button
@@ -260,25 +327,36 @@ export const App: React.FC = () => {
 
       {/* Main Command Center Grid */}
       <main className="flex-1 p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 max-w-[1920px] mx-auto w-full">
-        {/* Left Column: Disruption Studio (Col Span 3) */}
+        {/* Left Column: Link Inspector & Disruption Studio (Col Span 3) */}
         <div className="lg:col-span-3 flex flex-col gap-4">
+          {/* Link Inspector (Expands above Disruption Studio when a link is selected) */}
+          {selectedEdge && (
+            <LinkInspector
+              edge={selectedEdge}
+              activeDisruptions={activeDisruptions}
+              edgeEval={simulationResult?.scenario_edges?.[selectedEdge.id]}
+              onUpdateDisruption={handleUpdateDisruption}
+              onClose={() => setSelectedEdgeId(null)}
+            />
+          )}
+
+          {/* Categorized Disruption Studio */}
           <DisruptionStudio
-            edges={network?.edges || []}
             presets={presets}
-            selectedEdge={selectedEdge}
             activeDisruptions={activeDisruptions}
             isSimulating={isSimulating}
             onApplyPreset={handleApplyPreset}
-            onUpdateDisruption={handleUpdateDisruption}
             onRunSimulation={() => handleRunSimulation()}
             onResetSimulation={handleReset}
             onOpenCompare={handleOpenCompare}
           />
         </div>
 
-        {/* Center Column: Bird's-Eye Digital Twin Map & Impact Dashboard (Col Span 6) */}
-        {/* Center Column: Bird's-Eye Map (Real Bangalore / Schematic) & Impact Dashboard (Col Span 6) */}
+        {/* Center Column: Key Metrics (Above Map) & Digital Twin Map (Col Span 6) */}
         <div className="lg:col-span-6 flex flex-col gap-4">
+          {/* Real-time Metric KPI Dashboard (Above Map per Section 12) */}
+          <ImpactDashboard simulationResult={simulationResult} />
+
           {/* Interactive Map View */}
           <div className="flex-1 min-h-[520px]">
             {mapMode === "real_map" ? (
@@ -304,20 +382,23 @@ export const App: React.FC = () => {
               />
             )}
           </div>
-
-          {/* Real-time Metric KPI Dashboard */}
-          <ImpactDashboard simulationResult={simulationResult} />
         </div>
 
         {/* Right Column: Cascade Timeline, Explainability & Vulnerability Ranking (Col Span 3) */}
         <div className="lg:col-span-3 flex flex-col gap-4">
-          <CascadeTimeline simulationResult={simulationResult} />
-          <ExplainabilityPanel simulationResult={simulationResult} />
-          <CriticalityRankPanel
-            edges={network?.edges || []}
-            simulationResult={simulationResult}
-            onSelectEdge={(edgeId) => setSelectedEdgeId(edgeId)}
-          />
+          <div id="tour-cascade-timeline">
+            <CascadeTimeline simulationResult={simulationResult} />
+          </div>
+          <div id="tour-explainability">
+            <ExplainabilityPanel simulationResult={simulationResult} />
+          </div>
+          <div id="tour-criticality-ranking">
+            <CriticalityRankPanel
+              edges={network?.edges || []}
+              simulationResult={simulationResult}
+              onSelectEdge={(edgeId) => setSelectedEdgeId(edgeId)}
+            />
+          </div>
         </div>
       </main>
 
@@ -327,6 +408,35 @@ export const App: React.FC = () => {
         onClose={() => setIsCompareOpen(false)}
         comparison={comparisonResult}
       />
+
+      {/* 12-Step Interactive Onboarding Guide Modal */}
+      <InteractiveUserGuide
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+        onFinish={handleFinishGuide}
+        onStepChange={handleGuideStepChange}
+      />
+
+      {/* Tutorial Completion Confirmation Toast */}
+      {showReadyToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#0F172A] border border-cyan-500/50 rounded-2xl p-4 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(6,182,212,0.3)] flex items-center gap-3 text-slate-100 animate-in fade-in slide-in-from-bottom-5">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0">
+            <Check className="w-4 h-4" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-white">✓ You're ready</h4>
+            <p className="text-[11px] text-slate-400">
+              Choose a disruption and run your first scenario.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowReadyToast(false)}
+            className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors ml-2"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

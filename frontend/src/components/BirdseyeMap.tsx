@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
-import { NodeData, EdgeData, EdgeEvaluation, SimulationResult, CriticalAssetData } from "../types";
-import { Activity, AlertOctagon, Hospital, Building, Navigation, Zap, Shield, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { Building, Hospital, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import React, { useState } from "react";
+import { CriticalAssetData, EdgeData, NodeData, SimulationResult } from "../types";
 
 interface BirdseyeMapProps {
   nodes: NodeData[];
@@ -71,7 +71,7 @@ export const BirdseyeMap: React.FC<BirdseyeMapProps> = ({
   };
 
   return (
-    <div className="relative w-full h-full bg-[#070B14] overflow-hidden flex items-center justify-center select-none border border-slate-800/80 rounded-2xl shadow-2xl">
+    <div id="tour-map-canvas" className="relative w-full h-full bg-[#070B14] overflow-hidden flex items-center justify-center select-none border border-slate-800/80 rounded-2xl shadow-2xl">
       {/* Background Digital Twin Grid */}
       <div 
         className="absolute inset-0 opacity-20 pointer-events-none"

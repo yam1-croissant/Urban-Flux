@@ -66,7 +66,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
   const polylineLayerGroupRef = useRef<L.LayerGroup | null>(null);
   const markerLayerGroupRef = useRef<L.LayerGroup | null>(null);
 
-  const [activeTile, setActiveTile] = useState<TileProvider>("carto_dark");
+  const [activeTile, setActiveTile] = useState<TileProvider>("satellite");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [roadGeometries, setRoadGeometries] = useState<RoadGeometry>({});
   const [isRoutingRoads, setIsRoutingRoads] = useState(false);
@@ -471,7 +471,7 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
   const handleResetView = () => mapInstanceRef.current?.setView(BENGALURU_CENTER, DEFAULT_ZOOM);
 
   return (
-    <div className="relative w-full h-full min-h-[540px] bg-[#070B14] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col">
+    <div id="tour-map-canvas" className="relative w-full h-full min-h-[540px] bg-[#070B14] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col">
       {/* Top Map Header Overlay */}
       <div className="absolute top-3 left-3 z-[400] flex items-center gap-2 bg-[#0F172A]/90 backdrop-blur-xl border border-slate-800 px-3.5 py-2 rounded-xl shadow-2xl">
         <Compass className="w-4 h-4 text-cyan-400 animate-spin-slow" />
