@@ -1,4 +1,4 @@
-# UrbanFlux (UrbanResilience)
+# UrbanFlux
 
 > **Deterministic Digital Twin & Cascading Infrastructure Disruption Simulator for Bengaluru**
 
@@ -18,9 +18,9 @@ When an acute shock occurs (e.g. Silk Board flyover shutdown or Bellandur ORR fl
 
 ## 2. 🚀 Quickstart & Setup
 
-### Step 1: Clone the Repository at the `backupbackup` branch
+### Step 1: Clone the Repository
 ```bash
-git clone -b backupbackup https://github.com/yam1-croissant/infrastructure-cascading.git
+git clone https://github.com/yam1-croissant/infrastructure-cascading.git
 cd infrastructure-cascading
 ```
 
