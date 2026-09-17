@@ -28,21 +28,30 @@ interface RealBangaloreMapProps {
 type TileProvider = "carto_dark" | "satellite" | "osm";
 type RoadGeometry = Record<string, [number, number][]>;
 
-const TILE_LAYERS: Record<TileProvider, { url: string; attribution: string; name: string }> = {
-  carto_dark: {
-    name: "Dark Matter",
-    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OSM</a>',
-  },
+const TILE_LAYERS: Record<
+  TileProvider,
+  { url: string; attribution: string; name: string; subdomains: string; maxZoom: number }
+> = {
   satellite: {
     name: "Satellite",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Earthstar Geographics',
+    subdomains: "",
+    maxZoom: 19,
+  },
+  carto_dark: {
+    name: "Dark Matter",
+    url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OSM</a>',
+    subdomains: "abcd",
+    maxZoom: 20,
   },
   osm: {
     name: "Street Map",
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: "abc", // OpenStreetMap only has a, b, c. "d" causes DNS errors resulting in black square voids!
+    maxZoom: 19,
   },
 };
 
@@ -167,8 +176,8 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
     const tileConfig = TILE_LAYERS[activeTile];
     const tileLayer = L.tileLayer(tileConfig.url, {
       attribution: tileConfig.attribution,
-      subdomains: "abcd",
-      maxZoom: 19,
+      subdomains: tileConfig.subdomains,
+      maxZoom: tileConfig.maxZoom,
     }).addTo(map);
 
     tileLayerRef.current = tileLayer;
@@ -194,8 +203,8 @@ export const RealBangaloreMap: React.FC<RealBangaloreMapProps> = ({
 
     const newTileLayer = L.tileLayer(tileConfig.url, {
       attribution: tileConfig.attribution,
-      subdomains: "abcd",
-      maxZoom: 19,
+      subdomains: tileConfig.subdomains,
+      maxZoom: tileConfig.maxZoom,
     }).addTo(mapInstanceRef.current);
 
     tileLayerRef.current = newTileLayer;
